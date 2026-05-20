@@ -23,9 +23,8 @@ class FavoritesScreen extends StatelessWidget {
 
         return Scaffold(
           appBar: AppBar(
-            automaticallyImplyLeading: false,
             title: Text(
-              'My Favorites',
+              'المفضلة',
               style: GoogleFonts.cairo(fontWeight: FontWeight.w700),
             ),
           ),
@@ -38,9 +37,9 @@ class FavoritesScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.favorite_border_rounded,
-                              size: 72, color: mutedColor.withOpacity(0.35)),
+                              size: 72, color: mutedColor.withValues(alpha: 0.35)),
                           const SizedBox(height: 16),
-                          Text('No favorites yet',
+                          Text('لا توجد مفضلات بعد',
                               style: GoogleFonts.cairo(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
@@ -51,7 +50,7 @@ class FavoritesScreen extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 40),
                             child: Text(
-                              'Tap the ❤️ icon on any restaurant card to save it here',
+                              'اضغط على أيقونة ❤️ في صفحة المطعم لحفظه هنا',
                               style: GoogleFonts.cairo(
                                   fontSize: 13, color: mutedColor),
                               textAlign: TextAlign.center,
@@ -112,7 +111,7 @@ class _FavoriteCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -132,14 +131,14 @@ class _FavoriteCard extends StatelessWidget {
                 placeholder: (_, __) => Container(
                   width: 110,
                   height: 110,
-                  color: AppTheme.secondary.withOpacity(0.08),
+                  color: AppTheme.secondary.withValues(alpha: 0.08),
                   child:
                       const Icon(Icons.restaurant, color: AppTheme.secondary),
                 ),
                 errorWidget: (_, __, ___) => Container(
                   width: 110,
                   height: 110,
-                  color: AppTheme.secondary.withOpacity(0.08),
+                  color: AppTheme.secondary.withValues(alpha: 0.08),
                   child:
                       const Icon(Icons.restaurant, color: AppTheme.secondary),
                 ),
@@ -193,12 +192,12 @@ class _FavoriteCard extends StatelessWidget {
                           horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         color: restaurant.isOpen
-                            ? AppTheme.success.withOpacity(0.1)
-                            : Colors.red.withOpacity(0.1),
+                            ? AppTheme.success.withValues(alpha: 0.1)
+                            : Colors.red.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        restaurant.isOpen ? 'Open' : 'Closed',
+                        restaurant.isOpen ? 'مفتوح' : 'مغلق',
                         style: GoogleFonts.cairo(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -220,7 +219,7 @@ class _FavoriteCard extends StatelessWidget {
                   width: 34,
                   height: 34,
                   decoration: BoxDecoration(
-                    color: AppTheme.primary.withOpacity(0.1),
+                    color: AppTheme.primary.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.favorite_rounded,

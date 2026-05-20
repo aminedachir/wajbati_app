@@ -9,7 +9,7 @@ class NotificationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notifications',
+        title: Text('الإشعارات',
             style: GoogleFonts.cairo(fontWeight: FontWeight.w700)),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
@@ -26,8 +26,8 @@ class NotificationScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: index % 3 == 0
-                      ? AppTheme.primary.withOpacity(0.1)
-                      : Colors.green.withOpacity(0.1),
+                      ? AppTheme.primary.withValues(alpha: 0.1)
+                      : Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -35,18 +35,16 @@ class NotificationScreen extends StatelessWidget {
                     color: index % 3 == 0 ? AppTheme.primary : Colors.green),
               ),
               title: Text(
-                  'New order from ${[
-                    'Dar El Medina',
-                    'Pizza Palace',
-                    'Burger House'
+                  'طلب جديد من ${
+                    ['دار المدينة', 'بيتزا بالاس', 'برغر هاوس'
                   ][index % 3]}',
                   style: GoogleFonts.cairo(fontWeight: FontWeight.w600)),
               subtitle:
-                  Text('Your order #${1000 + index} is ready • 2 min ago'),
+                  Text('طلبك #${1000 + index} جاهز • منذ دقيقتين'),
               trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Order #${1000 + index} opened')),
+                  SnackBar(content: Text('تم فتح الطلب #${1000 + index}')),
                 );
               },
             ),

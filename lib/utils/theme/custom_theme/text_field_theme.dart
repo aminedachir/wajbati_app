@@ -16,7 +16,7 @@ class TextFieldTheme {
       fontStyle: FontStyle.normal,
     ),
     floatingLabelStyle: const TextStyle().copyWith(
-      color: Colors.black.withOpacity(0.8),
+      color: Colors.black.withValues(alpha: 0.8),
     ),
     border: const OutlineInputBorder().copyWith(
       borderRadius: BorderRadius.circular(14),
@@ -48,7 +48,7 @@ class TextFieldTheme {
     labelStyle: const TextStyle().copyWith(fontSize: 14, color: Colors.white),
     hintStyle: const TextStyle().copyWith(fontSize: 14, color: Colors.white),
     floatingLabelStyle: const TextStyle().copyWith(
-      color: Colors.white.withOpacity(0.8),
+      color: Colors.white.withValues(alpha: 0.8),
     ),
     border: const OutlineInputBorder().copyWith(
       borderRadius: BorderRadius.circular(14),

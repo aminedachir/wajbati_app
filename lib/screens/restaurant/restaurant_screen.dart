@@ -6,9 +6,10 @@ import '../../theme/app_theme.dart';
 import '../../models/models.dart';
 import '../../models/providers.dart';
 import '../../models/restaurant_review.dart';
+import '../cart/cart_screen.dart';
+import '../../widgets/intro_video_widget.dart';
 import '../../widgets/widgets.dart';
 import '../../utils/appwrite_service.dart';
-import '../cart/cart_screen.dart';
 
 class RestaurantScreen extends StatefulWidget {
   final Restaurant restaurant;
@@ -23,7 +24,8 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
   List<RestaurantReview> _reviews = [];
   bool _loadingMenu = true;
   bool _loadingReviews = true;
-  String _selectedCategory = 'All';
+  String _selectedCategory = 'الكل';
+  bool _showHealthOnly = false;
 
   @override
   void initState() {
@@ -34,6 +36,112 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
 
   Future<void> _loadMenu() async {
     final items = await AppwriteService.getMenuItems(widget.restaurant.id);
+
+    // Inject mock diabetic meals for testing if not present and NOT a Patisserie
+    final isNotPatisserie = widget.restaurant.type != 'Patisserie';
+
+    if (isNotPatisserie && !items.any((i) => i.category == 'وجبات السكري')) {
+      items.addAll([
+        const MenuItem(
+          id: 'diabetic_mock_1',
+          name: 'سلطة البقوليات العضوية',
+          nameAr: 'سلطة البقوليات العضوية',
+          description: 'حمص، عدس، كينوا مع خضروات طازجة وزيت زيتون بكر ممتاز.',
+          price: 450,
+          category: 'وجبات السكري',
+          imageUrl:
+              'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=2070',
+          isDiabeticFriendly: true,
+        ),
+        const MenuItem(
+          id: 'diabetic_mock_2',
+          name: 'سلمون مشوي بالأعشاب',
+          nameAr: 'سلمون مشوي بالأعشاب',
+          description:
+              'قطعة سلمون فاخرة مشوية مع أعشاب برية تقدم مع خضروات موسمية.',
+          price: 850,
+          category: 'وجبات السكري',
+          imageUrl:
+              'https://images.unsplash.com/photo-1485921325833-c519f76c4927?q=80&w=1964',
+          isDiabeticFriendly: true,
+        ),
+        const MenuItem(
+          id: 'diabetic_mock_3',
+          name: 'طاجين خضروات قليل الدسم',
+          nameAr: 'طاجين خضروات قليل الدسم',
+          description:
+              'مزيج من الخضروات الموسمية المطهوة ببطء مع توابل طبيعية بدون زيوت مهدرجة.',
+          price: 550,
+          category: 'وجبات السكري',
+          imageUrl:
+              'https://images.unsplash.com/photo-1547592166-23ac45744acd?q=80&w=2071',
+          isDiabeticFriendly: true,
+        ),
+        const MenuItem(
+          id: 'diabetic_mock_4',
+          name: 'دجاج مشوي بتتبيلة الليمون',
+          nameAr: 'دجاج مشوي بتتبيلة الليمون',
+          description:
+              'صدر دجاج مشوي غني بالبروتين مع تتبيلة الليمون والثوم المنعشة.',
+          price: 680,
+          category: 'وجبات السكري',
+          imageUrl:
+              'https://images.unsplash.com/photo-1532550907401-a500c9a57435?q=80&w=2070',
+          isDiabeticFriendly: true,
+        ),
+        const MenuItem(
+          id: 'diet_plan_1',
+          name: 'طاجين زيتون صحي',
+          nameAr: 'طاجين زيتون صحي (قليل الملح)',
+          description: 'طاجين زيتون تقليدي محضر بطريقة صحية للحمية.',
+          price: 600,
+          category: 'حمية وغذاء صحي',
+          imageUrl: 'https://images.unsplash.com/photo-1541518763669-27f90b116ad4?q=80&w=2070',
+          isHealthOriented: true,
+        ),
+        const MenuItem(
+          id: 'diet_plan_2',
+          name: 'كسكسي قمح كامل',
+          nameAr: 'كسكسي بالخضار (قمح كامل)',
+          description: 'كسكسي تقليدي مصنوع من القمح الكامل الغني بالألياف.',
+          price: 750,
+          category: 'حمية وغذاء صحي',
+          imageUrl: 'https://images.unsplash.com/photo-1541518763669-27f90b116ad4?q=80&w=2070',
+          isHealthOriented: true,
+        ),
+        const MenuItem(
+          id: 'protein_plan_1',
+          name: 'وجبة البروتين العالية',
+          nameAr: 'صدر دجاج مع عدس',
+          description: 'وجبة متكاملة غنية بالبروتين للرياضيين.',
+          price: 900,
+          category: 'رياضة وبروتين',
+          imageUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=2080',
+          isHealthOriented: true,
+        ),
+        const MenuItem(
+          id: 'gluten_free_1',
+          name: 'خبز الدار بدون غلوتين',
+          nameAr: 'خبز الدار (بدون غلوتين)',
+          description: 'خبز منزلي تقليدي محضر بدقيق خاص لمرضى الحساسية.',
+          price: 300,
+          category: 'طلبات خاصة وحساسية',
+          imageUrl: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=2072',
+          isHealthOriented: true,
+        ),
+        const MenuItem(
+          id: 'vegetarian_1',
+          name: 'شربة فريك نباتية',
+          nameAr: 'شربة فريك (نباتية بالكامل)',
+          description: 'شربة تقليدية غنية بالخضروات وبدون أي لحوم.',
+          price: 400,
+          category: 'نباتي وصحي',
+          imageUrl: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?q=80&w=2071',
+          isHealthOriented: true,
+        ),
+      ]);
+    }
+
     if (mounted) {
       setState(() {
         _menu = items;
@@ -53,7 +161,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
               id: doc.$id,
               restaurantId: widget.restaurant.id,
               userId: d['userId'] ?? '',
-              userName: d['userName'] ?? 'Anonymous',
+              userName: d['userName'] ?? 'مجهول',
               comment: d['comment'] ?? '',
               rating: (d['rating'] as num?)?.toDouble() ?? 0.0,
               date: DateTime.tryParse(d['createdAt'] ?? '') ?? DateTime.now(),
@@ -69,12 +177,20 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
 
   List<String> get _menuCategories {
     final cats = _menu.map((i) => i.category).toSet().toList()..sort();
-    return ['All', ...cats];
+    return ['الكل', ...cats];
   }
 
   List<MenuItem> get _filteredMenu {
-    if (_selectedCategory == 'All') return _menu;
-    return _menu.where((i) => i.category == _selectedCategory).toList();
+    List<MenuItem> list = _menu;
+    if (_selectedCategory != 'الكل') {
+      list = list.where((i) => i.category == _selectedCategory).toList();
+    }
+    if (_showHealthOnly) {
+      list = list
+          .where((i) => i.isDiabeticFriendly || i.isHealthOriented)
+          .toList();
+    }
+    return list;
   }
 
   @override
@@ -131,26 +247,36 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                   CachedNetworkImage(
                     imageUrl: widget.restaurant.imageUrl,
                     fit: BoxFit.cover,
-                    placeholder: (_, __) =>
-                        Container(color: AppTheme.secondary.withOpacity(0.1)),
+                    placeholder: (_, __) => Container(
+                        color: AppTheme.secondary.withValues(alpha: 0.1)),
                     errorWidget: (_, __, ___) => Container(
-                      color: AppTheme.secondary.withOpacity(0.1),
+                      color: AppTheme.secondary.withValues(alpha: 0.1),
                       child: const Icon(Icons.restaurant,
                           size: 60, color: AppTheme.secondary),
                     ),
                   ),
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
-                          Colors.black.withOpacity(0.4),
-                        ],
+                  if (widget.restaurant.videoUrl != null)
+                    Positioned.fill(
+                      child: Center(
+                        child: IconButton(
+                          icon: const Icon(Icons.play_circle_fill,
+                              size: 64, color: Colors.white70),
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.black,
+                              builder: (_) => SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.8,
+                                child: IntroVideoWidget(
+                                    videoUrl: widget.restaurant.videoUrl!),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -188,7 +314,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
-                          color: AppTheme.success.withOpacity(0.1),
+                          color: AppTheme.success.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
@@ -229,7 +355,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                           icon: widget.restaurant.isOpen
                               ? Icons.check_circle_rounded
                               : Icons.cancel_rounded,
-                          label: widget.restaurant.isOpen ? 'Open' : 'Closed',
+                          label: widget.restaurant.isOpen ? 'مفتوح' : 'مغلق',
                           isDark: isDark,
                           color: widget.restaurant.isOpen
                               ? AppTheme.success
@@ -256,12 +382,27 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                   const SizedBox(height: 20),
                   const Divider(height: 1),
                   const SizedBox(height: 16),
-                  Text('Menu',
-                      style: GoogleFonts.cairo(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          color:
-                              isDark ? AppTheme.textDark : AppTheme.textLight)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('القائمة',
+                          style: GoogleFonts.cairo(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              color: isDark
+                                  ? AppTheme.textDark
+                                  : AppTheme.textLight)),
+                      FilterChip(
+                        label: Text('وجبات صحية',
+                            style: GoogleFonts.cairo(
+                                fontSize: 12, fontWeight: FontWeight.bold)),
+                        selected: _showHealthOnly,
+                        onSelected: (v) => setState(() => _showHealthOnly = v),
+                        selectedColor: AppTheme.success.withValues(alpha: 0.2),
+                        checkmarkColor: AppTheme.success,
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -330,9 +471,9 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                   child: Column(
                     children: [
                       Icon(Icons.restaurant_menu_outlined,
-                          size: 56, color: mutedColor.withOpacity(0.4)),
+                          size: 56, color: mutedColor.withValues(alpha: 0.4)),
                       const SizedBox(height: 12),
-                      Text('No menu items yet',
+                      Text('لا توجد عناصر في القائمة حالياً',
                           style: GoogleFonts.cairo(
                               fontSize: 15, color: mutedColor)),
                     ],
@@ -370,7 +511,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
               padding: const EdgeInsets.fromLTRB(20, 28, 20, 12),
               child: Row(
                 children: [
-                  Text('Reviews',
+                  Text('التقييمات',
                       style: GoogleFonts.cairo(
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
@@ -382,7 +523,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: AppTheme.primary.withOpacity(0.1),
+                        color: AppTheme.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text('${_reviews.length}',
@@ -423,14 +564,14 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                   child: Column(
                     children: [
                       Icon(Icons.rate_review_outlined,
-                          size: 40, color: mutedColor.withOpacity(0.5)),
+                          size: 40, color: mutedColor.withValues(alpha: 0.5)),
                       const SizedBox(height: 8),
-                      Text('No reviews yet',
+                      Text('لا توجد تقييمات بعد',
                           style: GoogleFonts.cairo(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: mutedColor)),
-                      Text('Be the first to review!',
+                      Text('كن أول من يقيم!',
                           style: GoogleFonts.cairo(
                               fontSize: 12, color: mutedColor)),
                     ],
@@ -460,7 +601,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                 color: isDark ? AppTheme.darkCard : Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
+                    color: Colors.black.withValues(alpha: 0.08),
                     blurRadius: 16,
                     offset: const Offset(0, -4),
                   ),
@@ -488,19 +629,19 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          '${cart.itemCount} item${cart.itemCount > 1 ? 's' : ''}',
+                          '${cart.itemCount} وجبة',
                           style: GoogleFonts.cairo(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
                               fontSize: 13),
                         ),
                       ),
-                      Text('View Cart',
+                      Text('عرض السلة',
                           style: GoogleFonts.cairo(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
                               fontSize: 16)),
-                      Text('${cart.total.toInt()} DA',
+                      Text('${cart.total.toInt()} د.ج',
                           style: GoogleFonts.cairo(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
@@ -533,7 +674,7 @@ class _ReviewCard extends StatelessWidget {
             color: isDark ? AppTheme.darkDivider : AppTheme.lightDivider),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 8,
               offset: const Offset(0, 2)),
         ],
@@ -545,7 +686,7 @@ class _ReviewCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 18,
-                backgroundColor: AppTheme.primary.withOpacity(0.1),
+                backgroundColor: AppTheme.primary.withValues(alpha: 0.1),
                 child: Text(
                   review.userName.isNotEmpty
                       ? review.userName[0].toUpperCase()
@@ -605,9 +746,9 @@ class _ReviewCard extends StatelessWidget {
 
   String _formatDate(DateTime d) {
     final diff = DateTime.now().difference(d);
-    if (diff.inDays == 0) return 'Today';
-    if (diff.inDays == 1) return 'Yesterday';
-    if (diff.inDays < 7) return '${diff.inDays} days ago';
+    if (diff.inDays == 0) return 'اليوم';
+    if (diff.inDays == 1) return 'أمس';
+    if (diff.inDays < 7) return 'منذ ${diff.inDays} أيام';
     return '${d.day}/${d.month}/${d.year}';
   }
 }
@@ -631,7 +772,7 @@ class _InfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: c.withOpacity(0.08),
+        color: c.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(

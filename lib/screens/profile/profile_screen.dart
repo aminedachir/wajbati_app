@@ -6,6 +6,7 @@ import '../../models/providers.dart';
 import '../../utils/theme_utils.dart';
 import '../order/track_order_screen.dart';
 import '../orders/orders_screen.dart';
+import '../favorites/favorites_screen.dart';
 import '../auth/login_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -23,7 +24,7 @@ class ProfileScreen extends StatelessWidget {
       return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          title: Text('My Profile',
+          title: Text('حسابي',
               style: GoogleFonts.cairo(fontWeight: FontWeight.w700)),
         ),
         body: Center(
@@ -36,14 +37,14 @@ class ProfileScreen extends StatelessWidget {
                   width: 90,
                   height: 90,
                   decoration: BoxDecoration(
-                    color: AppTheme.primary.withOpacity(0.1),
+                    color: AppTheme.primary.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.person_outline_rounded,
                       size: 44, color: AppTheme.primary),
                 ),
                 const SizedBox(height: 20),
-                Text('Sign in to your account',
+                Text('سجل دخولك إلى حسابك',
                     style: GoogleFonts.cairo(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
@@ -51,7 +52,7 @@ class ProfileScreen extends StatelessWidget {
                             isDark ? AppTheme.textDark : AppTheme.textLight)),
                 const SizedBox(height: 8),
                 Text(
-                  'Access your orders, favorites and settings',
+                  'الوصول إلى طلباتك والمفضلة والإعدادات',
                   style: GoogleFonts.cairo(fontSize: 14, color: mutedColor),
                   textAlign: TextAlign.center,
                 ),
@@ -70,7 +71,7 @@ class ProfileScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(14)),
                       elevation: 0,
                     ),
-                    child: Text('Sign In',
+                    child: Text('تسجيل الدخول',
                         style: GoogleFonts.cairo(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -88,7 +89,7 @@ class ProfileScreen extends StatelessWidget {
     if (auth.isGuest) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('My Profile',
+          title: Text('حسابي',
               style: GoogleFonts.cairo(fontWeight: FontWeight.w700)),
         ),
         body: ListView(
@@ -102,7 +103,7 @@ class ProfileScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -114,7 +115,7 @@ class ProfileScreen extends StatelessWidget {
                     width: 60,
                     height: 60,
                     decoration: BoxDecoration(
-                      color: AppTheme.secondary.withOpacity(0.1),
+                      color: AppTheme.secondary.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.person_outline_rounded,
@@ -128,7 +129,7 @@ class ProfileScreen extends StatelessWidget {
                         Text(auth.displayName,
                             style: GoogleFonts.cairo(
                                 fontSize: 16, fontWeight: FontWeight.w700)),
-                        Text('Guest Account',
+                        Text('حساب ضيف',
                             style: GoogleFonts.cairo(
                                 fontSize: 13, color: mutedColor)),
                       ],
@@ -144,24 +145,24 @@ class ProfileScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    AppTheme.primary.withOpacity(0.1),
-                    AppTheme.secondary.withOpacity(0.05),
+                    AppTheme.primary.withValues(alpha: 0.1),
+                    AppTheme.secondary.withValues(alpha: 0.05),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppTheme.primary.withOpacity(0.2)),
+                border: Border.all(color: AppTheme.primary.withValues(alpha: 0.2)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Create an Account',
+                  Text('إنشاء حساب جديد',
                       style: GoogleFonts.cairo(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.primary)),
                   const SizedBox(height: 4),
                   Text(
-                    'Save your orders, favorites and get exclusive offers!',
+                    'احفظ طلباتك والمفضلة واحصل على عروض حصرية!',
                     style: GoogleFonts.cairo(fontSize: 13, color: mutedColor),
                   ),
                   const SizedBox(height: 12),
@@ -183,7 +184,7 @@ class ProfileScreen extends StatelessWidget {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10)),
                           ),
-                          child: Text('Sign In',
+                          child: Text('تسجيل الدخول',
                               style: GoogleFonts.cairo(
                                   color: AppTheme.primary,
                                   fontWeight: FontWeight.w600)),
@@ -207,7 +208,7 @@ class ProfileScreen extends StatelessWidget {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10)),
                           ),
-                          child: Text('Register',
+                          child: Text('إنشاء حساب',
                               style: GoogleFonts.cairo(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600)),
@@ -232,7 +233,7 @@ class ProfileScreen extends StatelessWidget {
     // ── Logged in user ────────────────────────────────────────
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Profile',
+        title: Text('حسابي',
             style: GoogleFonts.cairo(fontWeight: FontWeight.w700)),
         elevation: 0,
       ),
@@ -247,7 +248,7 @@ class ProfileScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -257,7 +258,7 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 32,
-                  backgroundColor: AppTheme.primary.withOpacity(0.1),
+                  backgroundColor: AppTheme.primary.withValues(alpha: 0.1),
                   child: Text(
                     auth.initials,
                     style: const TextStyle(
@@ -286,17 +287,17 @@ class ProfileScreen extends StatelessWidget {
 
           const SizedBox(height: 28),
 
-          _SectionLabel(label: 'My Account', isDark: isDark),
+          _SectionLabel(label: 'حسابي', isDark: isDark),
           const SizedBox(height: 10),
 
           // Track Order
           _ProfileTile(
             icon: Icons.local_shipping_outlined,
             iconColor: AppTheme.secondary,
-            title: 'Track My Order',
+            title: 'تتبع طلبي',
             subtitle: ordersProvider.orders.isNotEmpty
-                ? 'Latest: ${ordersProvider.orders.first.orderNumber}'
-                : 'No active orders',
+                ? 'آخر طلب: ${ordersProvider.orders.first.orderNumber}'
+                : 'لا توجد طلبات نشطة',
             isDark: isDark,
             onTap: () {
               if (ordersProvider.orders.isNotEmpty) {
@@ -323,7 +324,7 @@ class ProfileScreen extends StatelessWidget {
                     } else if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('No orders to track yet',
+                          content: Text('لا توجد طلبات لتتبعها حالياً',
                               style: GoogleFonts.cairo()),
                           behavior: SnackBarBehavior.floating,
                           shape: RoundedRectangleBorder(
@@ -340,8 +341,8 @@ class ProfileScreen extends StatelessWidget {
           _ProfileTile(
             icon: Icons.receipt_long_rounded,
             iconColor: AppTheme.primary,
-            title: 'Order History',
-            subtitle: '${ordersProvider.orders.length} orders',
+            title: 'سجل الطلبات',
+            subtitle: '${ordersProvider.orders.length} طلب',
             isDark: isDark,
             onTap: () => Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const OrdersScreen())),
@@ -350,14 +351,24 @@ class ProfileScreen extends StatelessWidget {
           _ProfileTile(
             icon: Icons.location_on_outlined,
             iconColor: Colors.green,
-            title: 'Saved Addresses',
-            subtitle: 'Manage your delivery locations',
+            title: 'العناوين المحفوظة',
+            subtitle: 'إدارة مواقع التوصيل الخاصة بك',
             isDark: isDark,
             onTap: () {},
           ),
 
+          _ProfileTile(
+            icon: Icons.favorite_border_rounded,
+            iconColor: Colors.pink,
+            title: 'المفضلة',
+            subtitle: 'المطاعم والوجبات المفضلة لديك',
+            isDark: isDark,
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const FavoritesScreen())),
+          ),
+
           const SizedBox(height: 20),
-          _SectionLabel(label: 'Preferences', isDark: isDark),
+          _SectionLabel(label: 'التفضيلات', isDark: isDark),
           const SizedBox(height: 10),
 
           _ThemeToggle(
@@ -373,27 +384,27 @@ class ProfileScreen extends StatelessWidget {
           _ProfileTile(
             icon: Icons.logout_rounded,
             iconColor: Colors.red,
-            title: 'Logout',
-            subtitle: 'Sign out of your account',
+            title: 'تسجيل الخروج',
+            subtitle: 'تسجيل الخروج من حسابك',
             isDark: isDark,
             titleColor: Colors.red,
             onTap: () async {
               final confirmed = await showDialog<bool>(
                 context: context,
                 builder: (ctx) => AlertDialog(
-                  title: Text('Logout',
+                  title: Text('تسجيل الخروج',
                       style: GoogleFonts.cairo(fontWeight: FontWeight.w700)),
-                  content: Text('Are you sure you want to logout?',
+                  content: Text('هل أنت متأكد أنك تريد تسجيل الخروج؟',
                       style: GoogleFonts.cairo()),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(ctx, false),
-                      child: Text('Cancel',
+                      child: Text('إلغاء',
                           style: GoogleFonts.cairo(color: mutedColor)),
                     ),
                     TextButton(
                       onPressed: () => Navigator.pop(ctx, true),
-                      child: Text('Logout',
+                      child: Text('خروج',
                           style: GoogleFonts.cairo(
                               color: Colors.red, fontWeight: FontWeight.w700)),
                     ),
@@ -402,6 +413,7 @@ class ProfileScreen extends StatelessWidget {
               );
               if (confirmed == true && context.mounted) {
                 await auth.signOut();
+                if (!context.mounted) return;
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -464,7 +476,7 @@ class _ProfileTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -476,7 +488,7 @@ class _ProfileTile extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: iconColor.withOpacity(0.1),
+            color: iconColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: iconColor, size: 20),
@@ -516,7 +528,7 @@ class _ThemeToggle extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -524,18 +536,18 @@ class _ThemeToggle extends StatelessWidget {
       ),
       child: SwitchListTile.adaptive(
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
-        title: Text('Dark Mode',
+        title: Text('الوضع الليلي',
             style:
                 GoogleFonts.cairo(fontWeight: FontWeight.w700, fontSize: 14)),
         subtitle: Text(
-          isDark ? 'Eye-friendly dark theme' : 'Bright theme active',
+          isDark ? 'تفعيل الوضع المظلم المريح للعين' : 'تفعيل الوضع الفاتح',
           style: GoogleFonts.cairo(fontSize: 12, color: mutedColor),
         ),
         secondary: Container(
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: (isDark ? Colors.amber : Colors.blueGrey).withOpacity(0.1),
+            color: (isDark ? Colors.amber : Colors.blueGrey).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(

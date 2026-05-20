@@ -16,7 +16,7 @@ class CartController extends GetxController {
       items.clear();
     }
     restaurant.value = resto;
-    final idx = items.indexWhere((ci) => ci!.item.id == item.id);
+    final idx = items.indexWhere((ci) => ci.item.id == item.id);
     if (idx >= 0) {
       items[idx].quantity++;
     } else {

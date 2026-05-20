@@ -1,6 +1,5 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:flutter/foundation.dart';
-import '../utils/environment.dart';
 import '../utils/appwrite_service.dart';
 
 class StorageService {

@@ -17,6 +17,7 @@ class AppTheme {
   static const Color lightDivider = Color(0xFFEEEEEE);
   static const Color darkDivider = Color(0xFF2A2A3E);
   static const Color success = Color(0xFF2DCE89);
+  static const Color accent = Color(0xFFFF6B35);
 
   // Added generic getter for backward compatibility or simple use
   static Color textMuted(BuildContext context) {
@@ -32,7 +33,7 @@ class AppTheme {
       brightness: Brightness.light,
       primary: primary,
       secondary: secondary,
-      background: lightBg,
+      surface: lightBg,
     ),
     scaffoldBackgroundColor: lightBg,
     textTheme: GoogleFonts.cairoTextTheme().copyWith(
@@ -120,7 +121,7 @@ class AppTheme {
       brightness: Brightness.dark,
       primary: primary,
       secondary: secondary,
-      background: darkBg,
+      surface: darkBg,
     ),
     scaffoldBackgroundColor: darkBg,
     textTheme: GoogleFonts.cairoTextTheme().copyWith(

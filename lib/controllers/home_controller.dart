@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 import '../../utils/appwrite_service.dart';
-import '../../models/algerian_wilayas.dart';
 import '../../models/models.dart';
 
 class HomeController extends GetxController {
@@ -49,5 +48,6 @@ class HomeController extends GetxController {
     selectedWilaya.value = wilaya;
   }
 
+  @override
   void refresh() => loadRestaurants();
 }

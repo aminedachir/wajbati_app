@@ -65,5 +65,4 @@ class Ssize {
   // Grid view spacing
   static const double gridViewSpacing = 16.0;
 
-  static var spaceBetweenSections;
 }

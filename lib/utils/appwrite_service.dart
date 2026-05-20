@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:appwrite/appwrite.dart';
 import 'package:flutter/foundation.dart';
 import 'package:wajbati_dz/models/models.dart';
@@ -194,7 +193,7 @@ class AppwriteService {
       await databases.createDocument(
         databaseId: Environment.appwriteDatabaseId,
         collectionId: Environment.appwriteFavoritesCollectionId,
-        documentId: '${userId}_${restaurantId}',
+        documentId: '${userId}_$restaurantId',
         data: {'userId': userId, 'restaurantId': restaurantId},
       );
     } catch (e) {
@@ -208,7 +207,7 @@ class AppwriteService {
       await databases.deleteDocument(
         databaseId: Environment.appwriteDatabaseId,
         collectionId: Environment.appwriteFavoritesCollectionId,
-        documentId: '${userId}_${restaurantId}',
+        documentId: '${userId}_$restaurantId',
       );
     } catch (e) {
       debugPrint('Remove favorite error: $e');

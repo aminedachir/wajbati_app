@@ -16,45 +16,45 @@ class _NotificationScreenState extends State<NotificationScreen> {
       icon: Icons.check_circle_rounded,
       iconColor: AppTheme.success,
       bgColor: AppTheme.success,
-      title: 'Order Confirmed',
-      subtitle: 'Your order from Dar El Medina has been confirmed.',
-      time: '2 min ago',
+      title: 'تم تأكيد الطلب',
+      subtitle: 'تم تأكيد طلبك من مطعم دار المدينة.',
+      time: 'منذ دقيقتين',
       isRead: false,
     ),
     _NotifItem(
       icon: Icons.delivery_dining_rounded,
       iconColor: AppTheme.secondary,
       bgColor: AppTheme.secondary,
-      title: 'Out for Delivery',
-      subtitle: 'Your Burger House order is on its way!',
-      time: '15 min ago',
+      title: 'جاري التوصيل',
+      subtitle: 'طلبك من برجر هاوس في الطريق إليك!',
+      time: 'منذ 15 دقيقة',
       isRead: false,
     ),
     _NotifItem(
       icon: Icons.local_offer_rounded,
       iconColor: AppTheme.primary,
       bgColor: AppTheme.primary,
-      title: 'Special Offer 🎉',
-      subtitle: 'Free delivery today! Use code WAJBATI at checkout.',
-      time: '1 hour ago',
+      title: 'عرض خاص 🎉',
+      subtitle: 'توصيل مجاني اليوم! استخدم كود WAJBATI عند الدفع.',
+      time: 'منذ ساعة',
       isRead: true,
     ),
     _NotifItem(
       icon: Icons.star_rounded,
       iconColor: const Color(0xFFFFA726),
       bgColor: const Color(0xFFFFA726),
-      title: 'Rate Your Order',
-      subtitle: 'How was your meal from La Piazza? Leave a review.',
-      time: '2 hours ago',
+      title: 'قيم طلبك',
+      subtitle: 'كيف كانت وجبتك من لا بيازا؟ اترك تقييمك الآن.',
+      time: 'منذ ساعتين',
       isRead: true,
     ),
     _NotifItem(
       icon: Icons.restaurant_rounded,
       iconColor: AppTheme.primary,
       bgColor: AppTheme.primary,
-      title: 'New Restaurant',
-      subtitle: 'Sushi Baya is now available in your area!',
-      time: 'Yesterday',
+      title: 'مطعم جديد',
+      subtitle: 'سوشي بايا متاح الآن في منطقتك!',
+      time: 'أمس',
       isRead: true,
     ),
   ];
@@ -77,14 +77,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notifications',
+        title: Text('الإشعارات',
             style: GoogleFonts.cairo(fontWeight: FontWeight.w700)),
         actions: [
           if (_unreadCount > 0)
             TextButton(
               onPressed: _markAllRead,
               child: Text(
-                'Mark all read',
+                'تحديد الكل كمقروء',
                 style: GoogleFonts.cairo(
                     color: AppTheme.primary,
                     fontWeight: FontWeight.w600,
@@ -99,9 +99,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.notifications_off_outlined,
-                      size: 64, color: mutedColor.withOpacity(0.4)),
+                      size: 64, color: mutedColor.withValues(alpha: 0.4)),
                   const SizedBox(height: 12),
-                  Text('No notifications yet',
+                  Text('لا توجد إشعارات بعد',
                       style:
                           GoogleFonts.cairo(fontSize: 15, color: mutedColor)),
                 ],
@@ -124,15 +124,15 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       color: notif.isRead
                           ? (isDark ? AppTheme.darkCard : Colors.white)
                           : (isDark
-                              ? AppTheme.primary.withOpacity(0.08)
-                              : AppTheme.primary.withOpacity(0.04)),
+                              ? AppTheme.primary.withValues(alpha: 0.08)
+                              : AppTheme.primary.withValues(alpha: 0.04)),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: notif.isRead
                             ? (isDark
                                 ? AppTheme.darkDivider
                                 : AppTheme.lightDivider)
-                            : AppTheme.primary.withOpacity(0.2),
+                            : AppTheme.primary.withValues(alpha: 0.2),
                       ),
                     ),
                     child: Row(
@@ -143,7 +143,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           width: 44,
                           height: 44,
                           decoration: BoxDecoration(
-                            color: notif.bgColor.withOpacity(0.12),
+                            color: notif.bgColor.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Icon(notif.icon,
@@ -195,7 +195,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                 notif.time,
                                 style: GoogleFonts.cairo(
                                     fontSize: 11,
-                                    color: mutedColor.withOpacity(0.7)),
+                                    color: mutedColor.withValues(alpha: 0.7)),
                               ),
                             ],
                           ),

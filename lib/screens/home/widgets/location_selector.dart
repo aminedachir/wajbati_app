@@ -22,7 +22,7 @@ class LocationSelector extends StatelessWidget {
               size: 16, color: AppTheme.primary),
           const SizedBox(width: 4),
           Flexible(
-            child: Text('${homeProvider.selectedWilaya}, DZ',
+            child: Text('${homeProvider.selectedWilaya}، ج',
                 style: GoogleFonts.cairo(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -50,7 +50,7 @@ class LocationSelector extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Select Wilaya',
+            Text('اختر الولاية',
                 style: GoogleFonts.cairo(
                     fontSize: 20, fontWeight: FontWeight.w700)),
             const SizedBox(height: 16),

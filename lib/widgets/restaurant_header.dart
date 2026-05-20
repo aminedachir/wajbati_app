@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
-import '../models/models.dart';
 
 class RestaurantHeader extends StatelessWidget {
   final String name;

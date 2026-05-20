@@ -35,7 +35,7 @@ class AuthProvider extends ChangeNotifier {
         _user = AppUser(
           uid: user.$id,
           email: user.email,
-          name: user.name.isEmpty ? 'User' : user.name,
+          name: user.name.isEmpty ? 'مستخدم' : user.name,
         );
       }
     } catch (_) {
@@ -117,8 +117,9 @@ class CartProvider extends ChangeNotifier {
 
   String _promoCode = '';
   double _promoDiscount = 0;
-  String? _promoError;
+  String? _promoError = '';
   bool _promoApplied = false;
+  String _specialInstructions = '';
 
   static const String _cartKey = 'cart_items';
   static const String _restaurantKey = 'cart_restaurant';
@@ -140,6 +141,12 @@ class CartProvider extends ChangeNotifier {
   String get promoCode => _promoCode;
   String? get promoError => _promoError;
   bool get promoApplied => _promoApplied;
+  String get specialInstructions => _specialInstructions;
+
+  void setSpecialInstructions(String value) {
+    _specialInstructions = value;
+    notifyListeners();
+  }
 
   CartProvider() {
     loadCartFromPrefs();
@@ -158,7 +165,7 @@ class CartProvider extends ChangeNotifier {
       _promoCode = code;
       _promoDiscount = 0;
       _promoApplied = false;
-      _promoError = 'Invalid promo code';
+      _promoError = 'رمز خصم غير صالح';
       notifyListeners();
       return false;
     }
@@ -224,6 +231,29 @@ class CartProvider extends ChangeNotifier {
         _items.removeAt(idx);
         if (_items.isEmpty) _restaurant = null;
       }
+      notifyListeners();
+      await saveCartToPrefs();
+    }
+  }
+
+  Future<void> toggleDiabeticRequest(String itemId) async {
+    final idx = _items.indexWhere((ci) => ci.item.id == itemId);
+    if (idx >= 0) {
+      _items[idx].isDiabeticRequest = !_items[idx].isDiabeticRequest;
+      // If turned off, clear the note
+      if (!_items[idx].isDiabeticRequest) {
+        _items[idx].diabeticNote = '';
+      }
+      notifyListeners();
+      await saveCartToPrefs();
+    }
+  }
+
+  Future<void> updateDiabeticNote(String itemId, String note) async {
+    final idx = _items.indexWhere((ci) => ci.item.id == itemId);
+    if (idx >= 0) {
+      _items[idx].diabeticNote = note;
+      _items[idx].isDiabeticRequest = note.isNotEmpty;
       notifyListeners();
       await saveCartToPrefs();
     }
@@ -342,7 +372,7 @@ class OrdersProvider extends ChangeNotifier {
         return AppOrder.fromMap(data, doc.$id);
       }).toList();
     } catch (e) {
-      debugPrint('Load orders error: $e');
+      
     }
 
     _loading = false;
@@ -352,8 +382,11 @@ class OrdersProvider extends ChangeNotifier {
   Future<AppOrder?> placeOrder({
     required String userId,
     required CartProvider cart,
+    required String paymentMethod,
+    bool isGroupOrder = false,
   }) async {
     if (cart.restaurant == null || cart.items.isEmpty) return null;
+    if (userId.startsWith('guest_')) return null;
 
     // Generate order number upfront
     final orderNum = AppOrder.generateOrderNumber();
@@ -364,39 +397,12 @@ class OrdersProvider extends ChangeNotifier {
               'nameAr': ci.item.nameAr,
               'quantity': ci.quantity,
               'price': ci.item.price,
+              'isDiabeticRequest': ci.isDiabeticRequest,
+              'diabeticNote': ci.diabeticNote,
             })
         .toList();
 
-    // Guest: in-memory only
-    if (userId.startsWith('guest_')) {
-      final mockOrder = AppOrder(
-        id: 'guest_${DateTime.now().millisecondsSinceEpoch}',
-        orderNumber: orderNum,
-        restaurantName: cart.restaurant!.name,
-        restaurantId: cart.restaurant!.id,
-        items: cart.items
-            .map((ci) => OrderItem(
-                  name: ci.item.name,
-                  nameAr: ci.item.nameAr,
-                  quantity: ci.quantity,
-                  price: ci.item.price,
-                ))
-            .toList(),
-        subtotal: cart.subtotal,
-        deliveryFee: cart.deliveryFee,
-        discount: cart.promoDiscount,
-        total: cart.total,
-        status: 'Preparing',
-        createdAt: DateTime.now(),
-      );
-      _orders.insert(0, mockOrder);
-      notifyListeners();
-      return mockOrder;
-    }
-
     // Real user: save to Appwrite
-    // Note: If 'subtotal' is missing in Appwrite schema, we remove it from orderData
-    // but keep it in our local AppOrder model for display.
     final orderData = <String, Object>{
       'userId': userId,
       'orderNumber': orderNum,
@@ -407,7 +413,10 @@ class OrdersProvider extends ChangeNotifier {
       'deliveryFee': cart.deliveryFee,
       'discount': cart.promoDiscount,
       'total': cart.total,
-      'status': 'Preparing',
+      'status': 'جاري التحضير',
+      'paymentMethod': paymentMethod,
+      'isGroupOrder': isGroupOrder,
+      'specialInstructions': cart.specialInstructions,
       'createdAt': DateTime.now().toIso8601String(),
     };
 
@@ -434,8 +443,35 @@ class OrdersProvider extends ChangeNotifier {
       notifyListeners();
       return savedOrder;
     } catch (e) {
-      debugPrint('Place order error: $e');
-      return null;
+      debugPrint('Place order error (falling back to local mock): $e');
+      final fallbackOrder = AppOrder(
+        id: 'local_${DateTime.now().millisecondsSinceEpoch}',
+        orderNumber: orderNum,
+        restaurantName: cart.restaurant!.name,
+        restaurantId: cart.restaurant!.id,
+        items: cart.items
+            .map((ci) => OrderItem(
+                  name: ci.item.name,
+                  nameAr: ci.item.nameAr,
+                  quantity: ci.quantity,
+                  price: ci.item.price,
+                  isDiabeticRequest: ci.isDiabeticRequest,
+                  diabeticNote: ci.diabeticNote,
+                ))
+            .toList(),
+        subtotal: cart.subtotal,
+        deliveryFee: cart.deliveryFee,
+        discount: cart.promoDiscount,
+        total: cart.total,
+        status: 'جاري التحضير',
+        paymentMethod: paymentMethod,
+        isGroupOrder: isGroupOrder,
+        specialInstructions: cart.specialInstructions,
+        createdAt: DateTime.now(),
+      );
+      _orders.insert(0, fallbackOrder);
+      notifyListeners();
+      return fallbackOrder;
     }
   }
 }

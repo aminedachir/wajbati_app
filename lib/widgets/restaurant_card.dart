@@ -68,11 +68,11 @@ class RestaurantCard extends StatelessWidget {
         imageUrl: restaurant.imageUrl,
         fit: BoxFit.cover,
         placeholder: (context, url) => Container(
-          color: AppTheme.secondary.withOpacity(0.1),
+          color: AppTheme.secondary.withValues(alpha: 0.1),
           child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
         ),
         errorWidget: (context, url, error) => Container(
-          color: AppTheme.secondary.withOpacity(0.1),
+          color: AppTheme.secondary.withValues(alpha: 0.1),
           child:
               const Icon(Icons.restaurant, size: 48, color: AppTheme.secondary),
         ),
@@ -98,7 +98,7 @@ class RestaurantCard extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 6,
                   ),
                 ],

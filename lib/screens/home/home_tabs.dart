@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../favorites/favorites_screen.dart';
+import '../discover/discover_videos_screen.dart';
 import '../orders/orders_screen.dart';
 import '../profile/profile_screen.dart';
 import 'widgets/home_tab.dart' show HomeTab;
@@ -7,16 +7,16 @@ import 'widgets/home_tab.dart' show HomeTab;
 class HomeTabs {
   static List<Widget> tabs = [
     const HomeTab(),
-    const FavoritesScreen(),
+    const DiscoverVideosScreen(),
     const OrdersScreen(),
     const ProfileScreen(),
   ];
 
   static const List<BottomNavData> navData = [
-    BottomNavData(Icons.home_rounded, 'Home', 0),
-    BottomNavData(Icons.favorite_rounded, 'Favorites', 1),
-    BottomNavData(Icons.receipt_long_rounded, 'Orders', 2),
-    BottomNavData(Icons.person_rounded, 'Profile', 3),
+    BottomNavData(Icons.home_rounded, 'الرئيسية', 0),
+    BottomNavData(Icons.video_library_rounded, 'الفيديوهات', 1),
+    BottomNavData(Icons.receipt_long_rounded, 'طلباتي', 2),
+    BottomNavData(Icons.person_rounded, 'حسابي', 3),
   ];
 }
 

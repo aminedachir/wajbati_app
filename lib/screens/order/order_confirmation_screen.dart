@@ -7,7 +7,13 @@ import '../../models/models.dart';
 import '../order/track_order_screen.dart';
 
 class OrderConfirmationScreen extends StatefulWidget {
-  const OrderConfirmationScreen({super.key});
+  final String paymentMethod;
+  final bool isGroupOrder;
+  const OrderConfirmationScreen({
+    super.key,
+    required this.paymentMethod,
+    this.isGroupOrder = false,
+  });
 
   @override
   State<OrderConfirmationScreen> createState() =>
@@ -47,6 +53,8 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
       order = await orders.placeOrder(
         userId: auth.user!.uid,
         cart: cart,
+        paymentMethod: widget.paymentMethod,
+        isGroupOrder: widget.isGroupOrder,
       );
     }
 
@@ -74,9 +82,9 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final mutedColor = AppTheme.textMuted(context);
 
-    return WillPopScope(
+    return PopScope(
       // Prevent back navigation during saving
-      onWillPop: () async => !_saving,
+      canPop: !_saving,
       child: Scaffold(
         body: SafeArea(
           child: _saving
@@ -104,12 +112,12 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
           ),
           const SizedBox(height: 24),
           Text(
-            'Placing your order...',
+            'جاري إتمام طلبك...',
             style: GoogleFonts.cairo(fontSize: 16, color: mutedColor),
           ),
           const SizedBox(height: 8),
           Text(
-            'Please wait a moment',
+            'يرجى الانتظار لحظة',
             style: GoogleFonts.cairo(fontSize: 13, color: mutedColor),
           ),
         ],
@@ -128,19 +136,19 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+                color: Colors.red.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.error_outline_rounded,
                   size: 44, color: Colors.red),
             ),
             const SizedBox(height: 20),
-            Text('Order Failed',
+            Text('فشل في إتمام الطلب',
                 style: GoogleFonts.cairo(
                     fontSize: 22, fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
             Text(
-              'Something went wrong. Please try again.',
+              'حدث خطأ ما. يرجى المحاولة مرة أخرى.',
               style: GoogleFonts.cairo(
                   fontSize: 14, color: AppTheme.textMuted(context)),
               textAlign: TextAlign.center,
@@ -158,7 +166,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
                       borderRadius: BorderRadius.circular(14)),
                   elevation: 0,
                 ),
-                child: Text('Back to Home',
+                child: Text('العودة للرئيسية',
                     style: GoogleFonts.cairo(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -185,7 +193,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: AppTheme.success.withOpacity(0.12),
+                color: AppTheme.success.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -199,7 +207,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
           const SizedBox(height: 20),
 
           Text(
-            'Order Confirmed! 🎉',
+            'تم تأكيد طلبك! 🎉',
             style: GoogleFonts.cairo(
                 fontSize: 26,
                 fontWeight: FontWeight.w700,
@@ -208,7 +216,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
 
           const SizedBox(height: 6),
           Text(
-            'Your food is being prepared',
+            'وجبتك في طور التحضير الآن',
             style: GoogleFonts.cairo(fontSize: 14, color: mutedColor),
           ),
 
@@ -218,9 +226,10 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: AppTheme.primary.withOpacity(0.1),
+                color: AppTheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppTheme.primary.withOpacity(0.3)),
+                border:
+                    Border.all(color: AppTheme.primary.withValues(alpha: 0.3)),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -229,7 +238,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
                       size: 16, color: AppTheme.primary),
                   const SizedBox(width: 8),
                   Text(
-                    'Order ${_confirmedOrder!.orderNumber}',
+                    'رقم الطلب ${_confirmedOrder!.orderNumber}',
                     style: GoogleFonts.cairo(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -255,7 +264,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
                         isDark ? AppTheme.darkDivider : AppTheme.lightDivider),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black.withValues(alpha: 0.04),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -269,7 +278,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: AppTheme.secondary.withOpacity(0.1),
+                          color: AppTheme.secondary.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(Icons.restaurant_rounded,
@@ -292,10 +301,11 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('${item.quantity}× ${item.name}',
+                            Text(
+                                '${item.quantity}× ${item.nameAr.isNotEmpty ? item.nameAr : item.name}',
                                 style: GoogleFonts.cairo(
                                     fontSize: 13, color: mutedColor)),
-                            Text('${(item.price * item.quantity).toInt()} DA',
+                            Text('${(item.price * item.quantity).toInt()} د.ج',
                                 style: GoogleFonts.cairo(
                                     fontSize: 13, fontWeight: FontWeight.w600)),
                           ],
@@ -305,10 +315,10 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Total',
+                      Text('الإجمالي',
                           style: GoogleFonts.cairo(
                               fontWeight: FontWeight.w700, fontSize: 15)),
-                      Text('${_confirmedOrder!.total.toInt()} DA',
+                      Text('${_confirmedOrder!.total.toInt()} د.ج',
                           style: GoogleFonts.cairo(
                               fontWeight: FontWeight.w700,
                               fontSize: 16,
@@ -326,9 +336,10 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppTheme.secondary.withOpacity(0.06),
+              color: AppTheme.secondary.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppTheme.secondary.withOpacity(0.15)),
+              border:
+                  Border.all(color: AppTheme.secondary.withValues(alpha: 0.15)),
             ),
             child: Row(
               children: [
@@ -338,12 +349,12 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Estimated arrival',
+                    Text('الوقت المتوقع للوصول',
                         style: GoogleFonts.cairo(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             color: mutedColor)),
-                    Text('30 – 45 minutes',
+                    Text('30 – 45 دقيقة',
                         style: GoogleFonts.cairo(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
@@ -376,7 +387,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
                     borderRadius: BorderRadius.circular(16)),
                 elevation: 0,
               ),
-              child: Text('Track My Order',
+              child: Text('تتبع طلبي',
                   style: GoogleFonts.cairo(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -398,7 +409,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16)),
               ),
-              child: Text('Back to Home',
+              child: Text('العودة للرئيسية',
                   style: GoogleFonts.cairo(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,

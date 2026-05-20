@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../theme/app_theme.dart';
 
 class ThemeController extends GetxController {
   var currentTheme = ThemeMode.system.obs;

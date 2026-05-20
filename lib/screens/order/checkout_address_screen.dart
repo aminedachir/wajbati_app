@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../theme/app_theme.dart';
 import 'order_confirmation_screen.dart';
+import 'checkout_payment_screen.dart';
 
 class CheckoutAddressScreen extends StatefulWidget {
   const CheckoutAddressScreen({super.key});
@@ -31,7 +32,7 @@ class _CheckoutAddressScreenState extends State<CheckoutAddressScreen> {
       // Logic for processing address would go here
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const OrderConfirmationScreen()),
+        MaterialPageRoute(builder: (_) => const CheckoutPaymentScreen()),
       );
     }
   }
@@ -42,7 +43,7 @@ class _CheckoutAddressScreenState extends State<CheckoutAddressScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Delivery Address'),
+        title: const Text('عنوان التوصيل'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -50,7 +51,7 @@ class _CheckoutAddressScreenState extends State<CheckoutAddressScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'How should we deliver?',
+              'كيف نصل إليك؟',
               style: GoogleFonts.cairo(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
@@ -60,8 +61,8 @@ class _CheckoutAddressScreenState extends State<CheckoutAddressScreen> {
 
             // Option 2: GPS Location
             _buildOptionCard(
-              title: 'Use Current Location',
-              subtitle: 'Activate GPS to find your address automatically',
+              title: 'استخدام الموقع الحالي',
+              subtitle: 'تفعيل الـ GPS لتحديد عنوانك تلقائياً',
               icon: Icons.my_location_rounded,
               isSelected: _useLocation,
               onTap: () => setState(() => _useLocation = true),
@@ -71,8 +72,8 @@ class _CheckoutAddressScreenState extends State<CheckoutAddressScreen> {
 
             // Option 1: Manual Entry
             _buildOptionCard(
-              title: 'Manual Entry',
-              subtitle: 'Fill in your details manually',
+              title: 'إدخال يدوي',
+              subtitle: 'أدخل تفاصيل العنوان يدوياً',
               icon: Icons.edit_location_alt_rounded,
               isSelected: !_useLocation,
               onTap: () => setState(() => _useLocation = false),
@@ -88,33 +89,33 @@ class _CheckoutAddressScreenState extends State<CheckoutAddressScreen> {
                     TextFormField(
                       controller: _nameController,
                       decoration: const InputDecoration(
-                        labelText: 'Full Name',
+                        labelText: 'الاسم الكامل',
                         prefixIcon: Icon(Icons.person_outline),
                       ),
                       validator: (v) =>
-                          v!.isEmpty ? 'Please enter your name' : null,
+                          v!.isEmpty ? 'يرجى إدخال الاسم' : null,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _phoneController,
                       keyboardType: TextInputType.phone,
                       decoration: const InputDecoration(
-                        labelText: 'Mobile Phone',
+                        labelText: 'رقم الهاتف',
                         prefixIcon: Icon(Icons.phone_outlined),
                       ),
                       validator: (v) =>
-                          v!.isEmpty ? 'Please enter your phone' : null,
+                          v!.isEmpty ? 'يرجى إدخال رقم الهاتف' : null,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _addressController,
                       maxLines: 2,
                       decoration: const InputDecoration(
-                        labelText: 'Full Address',
+                        labelText: 'العنوان الكامل',
                         prefixIcon: Icon(Icons.home_outlined),
                       ),
                       validator: (v) =>
-                          v!.isEmpty ? 'Please enter your address' : null,
+                          v!.isEmpty ? 'يرجى إدخال العنوان' : null,
                     ),
                   ],
                 ),
@@ -123,9 +124,9 @@ class _CheckoutAddressScreenState extends State<CheckoutAddressScreen> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppTheme.primary.withOpacity(0.05),
+                  color: AppTheme.primary.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppTheme.primary.withOpacity(0.2)),
+                  border: Border.all(color: AppTheme.primary.withValues(alpha: 0.2)),
                 ),
                 child: Column(
                   children: [
@@ -133,11 +134,11 @@ class _CheckoutAddressScreenState extends State<CheckoutAddressScreen> {
                         color: AppTheme.primary, size: 40),
                     const SizedBox(height: 12),
                     Text(
-                      'GPS Activation Required',
+                      'مطلوب تفعيل GPS',
                       style: GoogleFonts.cairo(fontWeight: FontWeight.w700),
                     ),
                     Text(
-                      'We will use your phone\'s location to deliver your food.',
+                      'سنستخدم موقع هاتفك لتوصيل طلبك بدقة.',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.cairo(fontSize: 13, color: mutedColor),
                     ),
@@ -147,28 +148,13 @@ class _CheckoutAddressScreenState extends State<CheckoutAddressScreen> {
 
             const SizedBox(height: 24),
 
-            // Promo Code Field
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: 'Code promo (optional)',
-                prefixIcon: Icon(Icons.local_offer_outlined),
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.close, size: 18),
-                  onPressed: () {},
-                ),
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-              ),
-            ),
-            const SizedBox(height: 16),
-
             SizedBox(
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
                 onPressed: _handleConfirm,
                 child: Text(
-                  _useLocation ? 'Activate & Confirm' : 'Confirm Address',
+                  'متابعة للدفع',
                   style: GoogleFonts.cairo(fontWeight: FontWeight.w700),
                 ),
               ),
@@ -194,7 +180,7 @@ class _CheckoutAddressScreenState extends State<CheckoutAddressScreen> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppTheme.primary.withOpacity(0.05)
+              ? AppTheme.primary.withValues(alpha: 0.05)
               : (isDark ? AppTheme.darkCard : Colors.white),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(

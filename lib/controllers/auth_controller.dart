@@ -23,7 +23,9 @@ class AuthController extends GetxController {
           name: currentUser.name ?? '',
         );
       }
-    } catch (e) {}
+    } catch (e) {
+      // Ignore auth error on startup
+    }
   }
 
   Future<bool> signIn(String email, String password) async {

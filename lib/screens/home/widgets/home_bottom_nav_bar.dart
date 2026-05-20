@@ -23,7 +23,7 @@ class HomeBottomNavBar extends StatelessWidget {
             color: Theme.of(context).cardTheme.color,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.07),
+                color: Colors.black.withValues(alpha: 0.07),
                 blurRadius: 16,
                 offset: const Offset(0, -4),
               ),
@@ -37,14 +37,14 @@ class HomeBottomNavBar extends StatelessWidget {
                 children: [
                   NavItem(
                     icon: Icons.home_rounded,
-                    label: 'Home',
+                    label: 'الرئيسية',
                     index: 0,
                     current: currentTab,
                     onTap: onTabChanged,
                   ),
-                  NavItem(
-                    icon: Icons.favorite_rounded,
-                    label: 'Favorites',
+                   NavItem(
+                    icon: Icons.video_library_rounded,
+                    label: 'الفيديوهات',
                     index: 1,
                     current: currentTab,
                     onTap: onTabChanged,
@@ -54,8 +54,7 @@ class HomeBottomNavBar extends StatelessWidget {
                     onTap: () => Navigator.pushNamed(context, '/cart'),
                     child: LayoutBuilder(
                       builder: (context, constraints) {
-                        final size =
-                            (constraints.maxWidth * 0.15).clamp(40.0, 56.0);
+                        final size = (constraints.maxWidth * 0.14).clamp(40.0, 48.0);
                         return Container(
                           width: size,
                           height: size,
@@ -68,7 +67,7 @@ class HomeBottomNavBar extends StatelessWidget {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: AppTheme.primary.withOpacity(0.4),
+                                color: AppTheme.primary.withValues(alpha: 0.4),
                                 blurRadius: 12,
                                 offset: const Offset(0, 4),
                               ),
@@ -113,14 +112,14 @@ class HomeBottomNavBar extends StatelessWidget {
                   ),
                   NavItem(
                     icon: Icons.receipt_long_rounded,
-                    label: 'Orders',
+                    label: 'طلباتي',
                     index: 2,
                     current: currentTab,
                     onTap: onTabChanged,
                   ),
                   NavItem(
                     icon: Icons.person_rounded,
-                    label: 'Profile',
+                    label: 'حسابي',
                     index: 3,
                     current: currentTab,
                     onTap: onTabChanged,

@@ -22,11 +22,11 @@ class FavoritesController extends GetxController {
       final user = await AppwriteService.getCurrentUser();
       if (user != null) {
         final docs = await AppwriteService.getFavorites(user.$id);
-        favorites.value =
-            docs.map((doc) => doc.data['restaurantId'] as String).toSet();
+        favorites.assignAll(
+            docs.map((doc) => doc.data['restaurantId'] as String));
       }
     } catch (e) {
-      print('Load favorites error: $e');
+      debugPrint('Load favorites error: $e');
     } finally {
       loading.value = false;
     }
@@ -48,7 +48,7 @@ class FavoritesController extends GetxController {
           favorites.add(id);
         }
       } catch (e) {
-        print('Toggle favorite error: $e');
+        debugPrint('Toggle favorite error: $e');
       } finally {
         loading.value = false;
       }

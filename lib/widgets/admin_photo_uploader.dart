@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -41,12 +40,11 @@ class _AdminPhotoUploaderState extends State<AdminPhotoUploader> {
     );
     final imageId = file.$id;
 
-    if (imageId != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Photo uploaded! ID: $imageId')),
-      );
-      setState(() => _imageBytes = null);
-    }
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Photo uploaded! ID: $imageId')),
+    );
+    setState(() => _imageBytes = null);
   }
 
   @override
@@ -64,15 +62,15 @@ class _AdminPhotoUploaderState extends State<AdminPhotoUploader> {
           children: [
             ElevatedButton.icon(
               onPressed: _pickImage,
-              icon: Icon(Icons.photo_library),
-              label: Text('Pick Photo'),
+              icon: const Icon(Icons.photo_library),
+              label: const Text('Pick Photo'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primary,
                 foregroundColor: Colors.white,
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             if (_imageBytes != null)
               Container(
                 height: 200,
@@ -84,19 +82,19 @@ class _AdminPhotoUploaderState extends State<AdminPhotoUploader> {
                   ),
                 ),
               ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             if (_imageBytes != null)
               ElevatedButton.icon(
                 onPressed: _uploadPhoto,
-                icon: Icon(Icons.cloud_upload),
-                label: Text('Upload to Bucket'),
+                icon: const Icon(Icons.cloud_upload),
+                label: const Text('Upload to Bucket'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   foregroundColor: Colors.white,
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                 ),
               ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
               'Bucket: restaurant_images_bucket\nPhotos public → imageFileId in restaurant doc',
               style: GoogleFonts.cairo(fontSize: 12, color: Colors.grey),

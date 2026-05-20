@@ -27,21 +27,21 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   String? _validateName(String? v) {
-    if (v == null || v.trim().isEmpty) return 'Full name is required';
-    if (v.trim().length < 2) return 'Name must be at least 2 characters';
+    if (v == null || v.trim().isEmpty) return 'الاسم الكامل مطلوب';
+    if (v.trim().length < 2) return 'يجب أن يكون الاسم حرفين على الأقل';
     return null;
   }
 
   String? _validateEmail(String? v) {
-    if (v == null || v.isEmpty) return 'Email is required';
+    if (v == null || v.isEmpty) return 'البريد الإلكتروني مطلوب';
     final reg = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!reg.hasMatch(v)) return 'Enter a valid email address';
+    if (!reg.hasMatch(v)) return 'أدخل بريداً إلكترونياً صالحاً';
     return null;
   }
 
   String? _validatePassword(String? v) {
-    if (v == null || v.isEmpty) return 'Password is required';
-    if (v.length < 8) return 'Password must be at least 8 characters';
+    if (v == null || v.isEmpty) return 'كلمة المرور مطلوبة';
+    if (v.length < 8) return 'يجب أن تكون كلمة المرور 8 أحرف على الأقل';
     return null;
   }
 
@@ -66,7 +66,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       const BorderRadius.vertical(bottom: Radius.circular(32)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: Colors.black.withValues(alpha: 0.04),
                       blurRadius: 16,
                       offset: const Offset(0, 4),
                     ),
@@ -103,7 +103,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           width: 52,
                           height: 52,
                           decoration: BoxDecoration(
-                            color: AppTheme.primary.withOpacity(0.1),
+                            color: AppTheme.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: const Icon(Icons.restaurant_menu_rounded,
@@ -114,7 +114,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Create Account',
+                              'إنشاء حساب جديد',
                               style: GoogleFonts.cairo(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w700,
@@ -124,7 +124,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               ),
                             ),
                             Text(
-                              'Join Wajbati & start ordering',
+                              'انضم إلى وجبتي وابدأ الطلب الآن',
                               style: GoogleFonts.cairo(
                                 fontSize: 13,
                                 color: isDark
@@ -148,18 +148,18 @@ class _SignupScreenState extends State<SignupScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _FormLabel(label: 'Full Name'),
+                      const _FormLabel(label: 'الاسم الكامل'),
                       const SizedBox(height: 8),
                       _FormField(
                         controller: _nameCtrl,
-                        hint: 'Ahmed Ben Ali',
+                        hint: 'أحمد بن علي',
                         icon: Icons.person_outline_rounded,
                         validator: _validateName,
                         isDark: isDark,
                       ),
 
                       const SizedBox(height: 18),
-                      _FormLabel(label: 'Email Address'),
+                      const _FormLabel(label: 'البريد الإلكتروني'),
                       const SizedBox(height: 8),
                       _FormField(
                         controller: _emailCtrl,
@@ -171,11 +171,11 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
 
                       const SizedBox(height: 18),
-                      _FormLabel(label: 'Password'),
+                      const _FormLabel(label: 'كلمة المرور'),
                       const SizedBox(height: 8),
                       _FormField(
                         controller: _passCtrl,
-                        hint: 'Min. 8 characters',
+                        hint: '8 أحرف على الأقل',
                         icon: Icons.lock_outline_rounded,
                         obscure: _obscurePass,
                         isDark: isDark,
@@ -183,8 +183,8 @@ class _SignupScreenState extends State<SignupScreen> {
                         suffixIcon: IconButton(
                           icon: Icon(
                             _obscurePass
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
                             size: 18,
                             color: isDark
                                 ? AppTheme.textMutedDark
@@ -213,7 +213,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                     _emailCtrl.text.trim(),
                                     _passCtrl.text,
                                   );
-                                  if (err != null && mounted) {
+                                  if (!mounted) return;
+                                  if (err != null) {
                                     ScaffoldMessenger.of(context)
                                         .showSnackBar(SnackBar(
                                       content: Text(_friendlyError(err),
@@ -224,7 +225,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                           borderRadius:
                                               BorderRadius.circular(12)),
                                     ));
-                                  } else if (mounted) {
+                                  } else {
                                     Navigator.pushNamedAndRemoveUntil(
                                         context, '/home', (_) => false);
                                   }
@@ -243,7 +244,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                       color: Colors.white, strokeWidth: 2),
                                 )
                               : Text(
-                                  'Create Account',
+                                  'إنشاء حساب',
                                   style: GoogleFonts.cairo(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
@@ -261,7 +262,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'Already have an account? ',
+                              'لديك حساب بالفعل؟ ',
                               style: GoogleFonts.cairo(
                                 fontSize: 14,
                                 color: isDark
@@ -272,7 +273,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             GestureDetector(
                               onTap: () => Navigator.pop(context),
                               child: Text(
-                                'Sign In',
+                                'تسجيل الدخول',
                                 style: GoogleFonts.cairo(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
@@ -297,13 +298,13 @@ class _SignupScreenState extends State<SignupScreen> {
 
   String _friendlyError(String raw) {
     if (raw.contains('already exists') || raw.contains('409')) {
-      return 'This email is already registered. Try signing in.';
+      return 'هذا البريد الإلكتروني مسجل بالفعل. حاول تسجيل الدخول.';
     }
-    if (raw.contains('Invalid email')) return 'Please enter a valid email.';
+    if (raw.contains('Invalid email')) return 'يرجى إدخال بريد إلكتروني صالح.';
     if (raw.contains('password')) {
-      return 'Password must be at least 8 characters.';
+      return 'يجب أن تكون كلمة المرور 8 أحرف على الأقل.';
     }
-    return 'Something went wrong. Please try again.';
+    return 'حدث خطأ ما. يرجى المحاولة مرة أخرى.';
   }
 }
 

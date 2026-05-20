@@ -14,17 +14,17 @@ class NotificationBadge extends StatelessWidget {
         width: 44,
         height: 44,
         decoration: BoxDecoration(
-          color: AppTheme.secondary.withOpacity(0.15),
+          color: AppTheme.secondary.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(22),
           border: Border.all(
-            color: AppTheme.secondary.withOpacity(0.3),
+            color: AppTheme.secondary.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            Icon(Icons.notifications_rounded,
+            const Icon(Icons.notifications_rounded,
                 size: 22, color: AppTheme.secondary),
             Positioned(
               right: -2,
@@ -37,7 +37,7 @@ class NotificationBadge extends StatelessWidget {
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 1),
                 ),
-                child: Center(
+                child: const Center(
                   child: Text('3',
                       style: TextStyle(
                         fontSize: 8,

@@ -15,7 +15,7 @@ class Responsive {
   static bool isSmallPhone(BuildContext context) => width(context) < 360;
 }
 
-// ─── Restaurant Card (Smooth & Low-Resource) ──────────────────────────
+// ─── Restaurant Card (Modern & Premium) ──────────────────────────
 class RestaurantCard extends StatelessWidget {
   final Restaurant restaurant;
   final VoidCallback? onTap;
@@ -28,84 +28,102 @@ class RestaurantCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).cardTheme.color,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image Section (Optimized with Caching)
+            // Image Section
             Expanded(
+              flex: 3,
               child: Stack(
                 children: [
-                  ClipRRect(
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(20)),
-                    child: CachedNetworkImage(
-                      imageUrl: restaurant.imageUrl,
-                      width: double.infinity,
-                      height: double.infinity,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        color: AppTheme.secondary.withOpacity(0.1),
-                        child: const Center(
-                            child: CircularProgressIndicator(strokeWidth: 2)),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        color: AppTheme.secondary.withOpacity(0.1),
-                        child: const Icon(Icons.restaurant,
-                            size: 48, color: AppTheme.secondary),
+                  Positioned.fill(
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                      child: CachedNetworkImage(
+                        imageUrl: restaurant.imageUrl,
+                        fit: BoxFit.cover,
+                        placeholder: (_, __) => Container(
+                          color: AppTheme.secondary.withValues(alpha: 0.1),
+                          child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                        ),
+                        errorWidget: (_, __, ___) => Container(
+                          color: AppTheme.secondary.withValues(alpha: 0.1),
+                          child: const Icon(Icons.restaurant, size: 40, color: AppTheme.secondary),
+                        ),
                       ),
                     ),
                   ),
-                  // Status Badge
-                  Positioned(
-                    top: 10,
-                    left: 10,
-                    child: _StatusBadge(isOpen: restaurant.isOpen),
+                  // Gradient Overlay
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withValues(alpha: 0.2),
+                            Colors.transparent,
+                            Colors.black.withValues(alpha: 0.3),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                  // Favorite Button (Using Selector to prevent full card rebuilds)
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: _FavoriteButton(restaurantId: restaurant.id),
-                  ),
+                  // Status & Favorite
+                  Positioned(top: 12, left: 12, child: _StatusBadge(isOpen: restaurant.isOpen)),
+                  Positioned(top: 10, right: 10, child: _FavoriteButton(restaurantId: restaurant.id)),
                 ],
               ),
             ),
             // Info Section
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    restaurant.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w700),
-                  ),
-                  Text(
-                    restaurant.nameAr,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                  const SizedBox(height: 8),
-                  const _RatingAndTimeRow(),
-                ],
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          restaurant.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.w800),
+                        ),
+                        Text(
+                          restaurant.nameAr,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.cairo(
+                            fontSize: 12, 
+                            color: isDark ? AppTheme.textMutedDark : AppTheme.textMutedLight,
+                            height: 1.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const _RatingAndTimeRow(),
+                  ],
+                ),
               ),
             ),
           ],
@@ -115,7 +133,7 @@ class RestaurantCard extends StatelessWidget {
   }
 }
 
-// ─── Menu Item Tile (Appwrite & Database Ready) ──────────────────────
+// ─── Menu Item Tile (Refined & Responsive) ──────────────────────
 class MenuItemTile extends StatelessWidget {
   final MenuItem item;
   final Restaurant restaurant;
@@ -134,63 +152,110 @@ class MenuItemTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Determine image size once per build
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final bool isSmall = Responsive.isSmallPhone(context);
-    final double imageSize = isSmall ? 60.0 : 72.0;
+    final double imageSize = isSmall ? 80.0 : 100.0;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
         border: Border.all(
-          color: Theme.of(context).brightness == Brightness.light
-              ? AppTheme.lightDivider
-              : AppTheme.darkDivider,
+          color: isDark ? AppTheme.darkDivider : AppTheme.lightDivider.withValues(alpha: 0.5),
         ),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Smooth Image with Caching
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: CachedNetworkImage(
-              imageUrl: item.imageUrl,
-              width: imageSize,
-              height: imageSize,
-              fit: BoxFit.cover,
-              placeholder: (context, url) => Container(color: Colors.grey[100]),
-              errorWidget: (context, url, error) => const Icon(Icons.fastfood),
-            ),
+          // Image with Badge
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: CachedNetworkImage(
+                  imageUrl: item.imageUrl,
+                  width: imageSize,
+                  height: imageSize,
+                  fit: BoxFit.cover,
+                  placeholder: (_, __) => Container(color: Colors.grey[100]),
+                  errorWidget: (_, __, ___) => const Icon(Icons.fastfood, color: Colors.grey),
+                ),
+              ),
+              if (item.isPopular)
+                Positioned(
+                  top: 6,
+                  right: 6,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primary,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Icon(Icons.star_rounded, size: 12, color: Colors.white),
+                  ),
+                ),
+            ],
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (item.isPopular) _PopularBadge(),
                 Text(
                   item.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontWeight: FontWeight.w700),
+                  style: GoogleFonts.cairo(fontSize: 15, fontWeight: FontWeight.w800),
                 ),
-                Text(item.nameAr,
-                    style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                const SizedBox(height: 6),
-                // Dynamic Price (Ready for Database)
                 Text(
-                  '${item.price.toInt()} DA',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w700, color: AppTheme.primary),
+                  item.description,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.cairo(
+                    fontSize: 11, 
+                    color: isDark ? AppTheme.textMutedDark : AppTheme.textMutedLight,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      if (item.isDiabeticFriendly) 
+                        const _HealthBadge(label: 'مناسب للسكري', color: Colors.green, icon: Icons.health_and_safety_outlined),
+                      if (item.isHealthOriented && !item.isDiabeticFriendly) 
+                        const _HealthBadge(label: 'وجبة صحية', color: AppTheme.success),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '${item.price.toInt()} د.ج',
+                      style: GoogleFonts.cairo(
+                        fontSize: 16, 
+                        fontWeight: FontWeight.w800, 
+                        color: AppTheme.primary,
+                      ),
+                    ),
+                    _QuantityControls(quantity: quantity, onAdd: onAdd, onRemove: onRemove),
+                  ],
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 8),
-          _QuantityControls(
-              quantity: quantity, onAdd: onAdd, onRemove: onRemove),
         ],
       ),
     );
@@ -211,9 +276,43 @@ class _StatusBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        isOpen ? 'Open' : 'Closed',
+        isOpen ? 'مفتوح' : 'مغلق',
         style: GoogleFonts.cairo(
             fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white),
+      ),
+    );
+  }
+}
+
+class _HealthBadge extends StatelessWidget {
+  final String label;
+  final Color color;
+  final IconData? icon;
+  const _HealthBadge({required this.label, required this.color, this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(left: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 10, color: color),
+            const SizedBox(width: 2),
+          ],
+          Text(
+            label,
+            style: GoogleFonts.cairo(
+                fontSize: 9, color: color, fontWeight: FontWeight.bold),
+          ),
+        ],
       ),
     );
   }
@@ -238,7 +337,7 @@ class _FavoriteButton extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 6,
                 ),
               ],
@@ -264,11 +363,11 @@ class _PopularBadge extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 4),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: AppTheme.primary.withOpacity(0.1),
+        color: AppTheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(6),
       ),
       child: const Text(
-        'Popular',
+        'مميز',
         style: TextStyle(
             fontSize: 10, color: AppTheme.primary, fontWeight: FontWeight.bold),
       ),
@@ -281,17 +380,17 @@ class _RatingAndTimeRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return const Row(
       children: [
-        const Icon(Icons.star_rounded, size: 16, color: Color(0xFFFFA726)),
-        const SizedBox(width: 4),
-        const Text('4.8',
+        Icon(Icons.star_rounded, size: 16, color: Color(0xFFFFA726)),
+        SizedBox(width: 4),
+        Text('4.8',
             style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-        const Text(' (320)', style: TextStyle(fontSize: 12)),
-        const Spacer(),
-        const Icon(Icons.access_time, size: 14),
-        const SizedBox(width: 3),
-        const Text('25-35 min', style: TextStyle(fontSize: 12)),
+        Text(' (320)', style: TextStyle(fontSize: 12)),
+        Spacer(),
+        Icon(Icons.access_time, size: 14),
+        SizedBox(width: 3),
+        Text('25-35 دقيقة', style: TextStyle(fontSize: 12)),
       ],
     );
   }

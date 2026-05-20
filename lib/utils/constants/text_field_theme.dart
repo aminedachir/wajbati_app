@@ -5,14 +5,14 @@ import 'colors.dart';
 class TTextFormFieldTheme {
   TTextFormFieldTheme._();
 
-  static InputDecorationTheme LightInputDecorationTheme = InputDecorationTheme(
+  static InputDecorationTheme lightInputDecorationTheme = InputDecorationTheme(
     errorMaxLines: 3,
     prefixIconColor: Ccolors.darkGrey,
     suffixIconColor: Ccolors.darkGrey,
     labelStyle: const TextStyle().copyWith(fontSize: Ssize.fontSizeMd, color: Ccolors.black),
     hintStyle: const TextStyle().copyWith(fontSize: Ssize.fontSizeSm, color: Ccolors.black),
     errorStyle: const TextStyle().copyWith(fontStyle: FontStyle.normal),
-    floatingLabelStyle: const TextStyle().copyWith(color: Ccolors.black.withOpacity(0.8)),
+    floatingLabelStyle: const TextStyle().copyWith(color: Ccolors.black.withValues(alpha: 0.8)),
     border: const OutlineInputBorder().copyWith(
       borderRadius: BorderRadius.circular(Ssize.inputFieldRadius),
       borderSide: const BorderSide(width: 1, color: Ccolors.grey),
@@ -48,7 +48,7 @@ class TTextFormFieldTheme {
       color: Ccolors.white,
     ),
     floatingLabelStyle: const TextStyle().copyWith(
-      color: Ccolors.white.withOpacity(0.8),
+      color: Ccolors.white.withValues(alpha: 0.8),
     ),
     border: const OutlineInputBorder().copyWith(
       borderRadius: BorderRadius.circular(Ssize.inputFieldRadius),

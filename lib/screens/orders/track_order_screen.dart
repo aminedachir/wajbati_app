@@ -20,12 +20,13 @@ class TrackOrderScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Order ${order.orderNumber}',
+          'تتبع الطلب ${order.orderNumber}',
           style: GoogleFonts.cairo(fontWeight: FontWeight.w700),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pushNamedAndRemoveUntil(
+              context, '/home', (route) => false),
         ),
       ),
       body: SingleChildScrollView(
@@ -35,7 +36,7 @@ class TrackOrderScreen extends StatelessWidget {
             Container(
               height: 220,
               width: double.infinity,
-              color: AppTheme.secondary.withOpacity(0.05),
+              color: AppTheme.secondary.withValues(alpha: 0.05),
               child: Center(
                 child: Lottie.network(
                   'https://assets5.lottiefiles.com/packages/lf20_m60yqnps.json',
@@ -61,7 +62,7 @@ class TrackOrderScreen extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Estimated Delivery',
+                          Text('وقت التسليم المتوقع',
                               style: GoogleFonts.cairo(
                                   fontSize: 14, color: mutedColor)),
                           Text(
@@ -76,7 +77,7 @@ class TrackOrderScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: AppTheme.primary.withOpacity(0.1),
+                          color: AppTheme.primary.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(Icons.timer_outlined,
@@ -106,7 +107,7 @@ class TrackOrderScreen extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: AppTheme.secondary.withOpacity(0.1),
+                                color: AppTheme.secondary.withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(Icons.restaurant_rounded,
@@ -140,7 +141,7 @@ class TrackOrderScreen extends StatelessWidget {
                                         fontSize: 13, color: mutedColor),
                                   ),
                                   Text(
-                                    '${(item.price * item.quantity).toInt()} DA',
+                                    '${(item.price * item.quantity).toInt()} د.ج',
                                     style: GoogleFonts.cairo(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w600,
@@ -155,10 +156,10 @@ class TrackOrderScreen extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Total',
+                            Text('الإجمالي',
                                 style: GoogleFonts.cairo(
                                     fontWeight: FontWeight.w700, fontSize: 15)),
-                            Text('${order.total.toInt()} DA',
+                            Text('${order.total.toInt()} د.ج',
                                 style: GoogleFonts.cairo(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 16,
@@ -172,7 +173,7 @@ class TrackOrderScreen extends StatelessWidget {
                   const SizedBox(height: 28),
 
                   // ── Tracking Steps ─────────────────────────
-                  Text('Order Status',
+                  Text('حالة الطلب',
                       style: GoogleFonts.cairo(
                           fontSize: 17,
                           fontWeight: FontWeight.w700,
@@ -267,7 +268,7 @@ class TrackOrderScreen extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 26,
-                        backgroundColor: AppTheme.secondary.withOpacity(0.1),
+                        backgroundColor: AppTheme.secondary.withValues(alpha: 0.1),
                         child: const Icon(Icons.person,
                             color: AppTheme.secondary, size: 28),
                       ),
@@ -276,10 +277,10 @@ class TrackOrderScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Ahmed Mohamed',
+                            Text('مندوب التوصيل',
                                 style: GoogleFonts.cairo(
                                     fontWeight: FontWeight.w700, fontSize: 15)),
-                            Text('Your Delivery Courier',
+                            Text('سائق التوصيل الخاص بك',
                                 style: GoogleFonts.cairo(
                                     fontSize: 13, color: mutedColor)),
                           ],
@@ -290,7 +291,7 @@ class TrackOrderScreen extends StatelessWidget {
                         icon: const Icon(Icons.phone_in_talk_rounded,
                             color: AppTheme.success),
                         style: IconButton.styleFrom(
-                          backgroundColor: AppTheme.success.withOpacity(0.1),
+                          backgroundColor: AppTheme.success.withValues(alpha: 0.1),
                         ),
                       ),
                     ],
@@ -301,7 +302,7 @@ class TrackOrderScreen extends StatelessWidget {
                   // ── Order placed time ──────────────────────
                   Center(
                     child: Text(
-                      'Ordered ${order.formattedDate}',
+                      'طلب بتاريخ ${order.formattedDate}',
                       style: GoogleFonts.cairo(fontSize: 12, color: mutedColor),
                     ),
                   ),
@@ -319,41 +320,41 @@ class TrackOrderScreen extends StatelessWidget {
   /// Build tracking steps based on the real order status
   List<Map<String, dynamic>> _buildSteps(String status) {
     const allStatuses = [
-      'Preparing',
-      'Ready',
-      'Out for Delivery',
-      'Delivered',
+      'جاري التحضير',
+      'جاهز',
+      'جاري التوصيل',
+      'تم التسليم',
     ];
     final currentIndex = allStatuses.indexOf(status);
 
     return [
       {
-        'title': 'Order Placed',
-        'subtitle': 'We received your order',
+        'title': 'تم استلام الطلب',
+        'subtitle': 'استلمنا طلبك',
         'isDone': true,
         'isActive': false,
       },
       {
-        'title': 'Preparing',
-        'subtitle': 'Restaurant is preparing your food',
+        'title': 'جاري التحضير',
+        'subtitle': 'المطعم يحضّر طعامك',
         'isDone': currentIndex > 0,
         'isActive': currentIndex == 0,
       },
       {
-        'title': 'Ready for Pickup',
-        'subtitle': 'Food ready, waiting for courier',
+        'title': 'جاهز للاستلام',
+        'subtitle': 'الطعام جاهز، بانتظار السائق',
         'isDone': currentIndex > 1,
         'isActive': currentIndex == 1,
       },
       {
-        'title': 'Out for Delivery',
-        'subtitle': 'Courier is on the way',
+        'title': 'جاري التوصيل',
+        'subtitle': 'السائق في الطريق',
         'isDone': currentIndex > 2,
         'isActive': currentIndex == 2,
       },
       {
-        'title': 'Delivered',
-        'subtitle': 'Enjoy your meal! 🎉',
+        'title': 'تم التسليم',
+        'subtitle': 'بالهناء والشفاء! 🎉',
         'isDone': currentIndex >= 3,
         'isActive': false,
       },
@@ -364,6 +365,6 @@ class TrackOrderScreen extends StatelessWidget {
     final eta = order.createdAt.add(const Duration(minutes: 35));
     final h = eta.hour.toString().padLeft(2, '0');
     final m = eta.minute.toString().padLeft(2, '0');
-    return '$h:$m (≈35 min)';
+    return '$h:$m (≈ 35 د.ق)';
   }
 }

@@ -32,9 +32,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
     final ordersProvider = context.watch<OrdersProvider>();
     final orders = ordersProvider.orders;
     final isLight = Theme.of(context).brightness == Brightness.light;
+    final mutedColor = AppTheme.textMuted(context);
 
     return Scaffold(
-      appBar: AppBar(  automaticallyImplyLeading: false,title: const Text('My Orders')),
+      appBar: AppBar(title: const Text('طلباتي')),
       body: ordersProvider.loading
           ? const Center(
               child: CircularProgressIndicator(color: AppTheme.primary))
@@ -45,12 +46,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     children: [
                       Icon(Icons.receipt_long_outlined,
                           size: 72,
-                          color: (isLight
-                                  ? AppTheme.textMutedLight
-                                  : AppTheme.textMutedDark)
-                              .withOpacity(0.4)),
+                          color: mutedColor.withValues(alpha: 0.4)),
                       const SizedBox(height: 16),
-                      Text('No orders yet',
+                      Text('لا توجد طلبات بعد',
                           style: GoogleFonts.cairo(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
@@ -58,7 +56,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                   ? AppTheme.textMutedLight
                                   : AppTheme.textMutedDark)),
                       const SizedBox(height: 8),
-                      Text('Your order history will appear here',
+                      Text('سجل طلباتك سيظهر هنا',
                           style: GoogleFonts.cairo(
                               fontSize: 13,
                               color: isLight
@@ -69,10 +67,28 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 )
               : ListView.builder(
                   padding: const EdgeInsets.all(20),
-                  itemCount: orders.length,
-                  itemBuilder: (context, i) {
-                    final o = orders[i];
-                    return Container(
+                  itemCount: _groupOrdersByRestaurant(orders).length,
+                  itemBuilder: (context, index) {
+                    final grouped = _groupOrdersByRestaurant(orders);
+                    final restaurantName = grouped.keys.elementAt(index);
+                    final restaurantOrders = grouped[restaurantName]!;
+                    
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Text(
+                            restaurantName,
+                            style: GoogleFonts.cairo(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: isLight ? AppTheme.textLight : AppTheme.textDark,
+                            ),
+                          ),
+                        ),
+                        ...restaurantOrders.map((o) {
+                          return Container(
                       margin: const EdgeInsets.only(bottom: 12),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
@@ -98,7 +114,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: AppTheme.success.withOpacity(0.1),
+                                  color: AppTheme.primary.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(o.status,
@@ -110,27 +126,56 @@ class _OrdersScreenState extends State<OrdersScreen> {
                             ],
                           ),
                           const SizedBox(height: 8),
-                          Text(o.restaurantName,
-                              style: GoogleFonts.cairo(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: isLight
-                                      ? AppTheme.textLight
-                                      : AppTheme.textDark)),
-                          const SizedBox(height: 4),
-                          // Items summary
-                          Text(
-                            o.items
-                                .map((i) => '${i.quantity}× ${i.name}')
-                                .join(', '),
-                            style: GoogleFonts.cairo(
-                                fontSize: 12,
-                                color: isLight
-                                    ? AppTheme.textMutedLight
-                                    : AppTheme.textMutedDark),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                          // Items summary with Diabetic Request badges
+                          ...o.items.map((i) => Row(
+                                children: [
+                                  Text(
+                                    '${i.quantity}× ${i.nameAr.isNotEmpty ? i.nameAr : i.name}',
+                                    style: GoogleFonts.cairo(
+                                        fontSize: 12,
+                                        color: isLight
+                                            ? AppTheme.textMutedLight
+                                            : AppTheme.textMutedDark),
+                                  ),
+                                  if (i.isDiabeticRequest)
+                                    Container(
+                                      margin: const EdgeInsets.only(right: 8),
+                                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                      decoration: BoxDecoration(
+                                        color: Colors.green.withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text('طلب سكري',
+                                          style: GoogleFonts.cairo(
+                                              fontSize: 9,
+                                              color: Colors.green,
+                                              fontWeight: FontWeight.bold)),
+                                    ),
+                                ],
+                              )),
+                          if (o.isGroupOrder)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.people_outline_rounded, size: 14, color: AppTheme.secondary),
+                                  const SizedBox(width: 4),
+                                  Text('طلب جماعي / مشاركة التوصيل',
+                                      style: GoogleFonts.cairo(
+                                          fontSize: 11,
+                                          color: AppTheme.secondary,
+                                          fontWeight: FontWeight.w600)),
+                                ],
+                              ),
+                            ),
+                          if (o.specialInstructions.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Text(
+                                'ملاحظات: ${o.specialInstructions}',
+                                style: GoogleFonts.cairo(fontSize: 11, color: Colors.orange.shade700),
+                              ),
+                            ),
                           const SizedBox(height: 8),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -141,7 +186,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                       color: isLight
                                           ? AppTheme.textMutedLight
                                           : AppTheme.textMutedDark)),
-                              Text('${o.total.toInt()} DA',
+                              Text('${o.total.toInt()} د.ج',
                                   style: GoogleFonts.cairo(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w700,
@@ -161,14 +206,25 @@ class _OrdersScreenState extends State<OrdersScreen> {
                               textStyle: GoogleFonts.cairo(
                                   fontSize: 12, fontWeight: FontWeight.w600),
                             ),
-                            child: const Text('Reorder'),
+                            child: const Text('إعادة طلب'),
                           ),
                         ],
                       ),
                     );
-                  },
-                ),
+                  }).toList(),
+                ],
+              );
+            },
+          ),
     );
+  }
+
+  Map<String, List<AppOrder>> _groupOrdersByRestaurant(List<AppOrder> orders) {
+    final Map<String, List<AppOrder>> grouped = {};
+    for (var order in orders) {
+      grouped.putIfAbsent(order.restaurantName, () => []).add(order);
+    }
+    return grouped;
   }
 
   Future<void> _reorder(BuildContext context, AppOrder order) async {
@@ -205,8 +261,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
       }
     }
 
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Items added to cart!', style: GoogleFonts.cairo()),
+      content: Text('تمت إضافة الوجبات إلى السلة!', style: GoogleFonts.cairo()),
       backgroundColor: AppTheme.success,
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
