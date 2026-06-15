@@ -104,7 +104,7 @@ class RestaurantCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          restaurant.name,
+                          restaurant.nameAr.isNotEmpty ? restaurant.nameAr : restaurant.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.w800),
@@ -211,13 +211,13 @@ class MenuItemTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item.name,
+                  item.nameAr.isNotEmpty ? item.nameAr : item.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.cairo(fontSize: 15, fontWeight: FontWeight.w800),
                 ),
                 Text(
-                  item.description,
+                  item.descriptionAr.isNotEmpty ? item.descriptionAr : item.description,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.cairo(
@@ -354,26 +354,6 @@ class _FavoriteButton extends StatelessWidget {
   }
 }
 
-class _PopularBadge extends StatelessWidget {
-  const _PopularBadge();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: AppTheme.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: const Text(
-        'مميز',
-        style: TextStyle(
-            fontSize: 10, color: AppTheme.primary, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-}
 
 class _RatingAndTimeRow extends StatelessWidget {
   const _RatingAndTimeRow();

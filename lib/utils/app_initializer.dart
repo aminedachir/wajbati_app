@@ -1,17 +1,26 @@
 import 'package:flutter/foundation.dart';
 import 'appwrite_service.dart';
+import 'notification_service.dart';
 
 class AppInitializer {
   static Future<void> initialize() async {
-    // Ensuring the Appwrite client is initialized
+    // 1. Appwrite client
     try {
       final client = AppwriteService.client;
-      // You can add more initialization logic here if needed, 
-      // like checking connectivity or pre-fetching essential data.
-      debugPrint("Appwrite initialized with project: ${client.config['project']}");
+      debugPrint('✅ Appwrite initialized: ${client.config['project']}');
     } catch (e) {
-      debugPrint("Error during Appwrite initialization: $e");
+      debugPrint('❌ Appwrite init error: $e');
       rethrow;
+    }
+
+    // 2. Local notifications (flutter_local_notifications)
+    //    Remote push: configure APNs/FCM provider in Appwrite Console → Messaging
+    //    then call NotificationService.registerPushTarget() after login.
+    try {
+      await NotificationService.initialize();
+      debugPrint('✅ Notifications initialized');
+    } catch (e) {
+      debugPrint('⚠️ Notification init error (non-fatal): $e');
     }
   }
 }

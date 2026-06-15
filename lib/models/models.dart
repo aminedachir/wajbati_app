@@ -126,6 +126,7 @@ class MenuItem {
   final String name;
   final String nameAr;
   final String description;
+  final String descriptionAr;
   final double price;
   final String category;
   final String imageUrl;
@@ -138,6 +139,7 @@ class MenuItem {
     required this.name,
     required this.nameAr,
     required this.description,
+    this.descriptionAr = '',
     required this.price,
     required this.category,
     required this.imageUrl,
@@ -151,6 +153,7 @@ class MenuItem {
         'name': name,
         'nameAr': nameAr,
         'description': description,
+        'descriptionAr': descriptionAr,
         'price': price,
         'category': category,
         'imageUrl': imageUrl,
@@ -162,6 +165,7 @@ class MenuItem {
         name: m['name'] ?? '',
         nameAr: m['nameAr'] ?? '',
         description: m['description'] ?? '',
+        descriptionAr: m['descriptionAr'] ?? '',
         price: (m['price'] as num?)?.toDouble() ?? 0.0,
         category: m['category'] ?? '',
         imageUrl: m['imageUrl'] ?? '',

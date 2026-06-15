@@ -1,7 +1,9 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:flutter/foundation.dart';
+import 'package:appwrite/models.dart';
 import 'package:wajbati_dz/models/models.dart';
 import '../utils/environment.dart';
+import 'translator_service.dart';
 
 class AppwriteService {
   static Client? _client;
@@ -88,10 +90,68 @@ class AppwriteService {
 
   static Databases? _databases;
   static Storage? _storage;
+  static Messaging? _messaging;
 
   static Databases get databases => _databases ??= Databases(client);
-
   static Storage get storage => _storage ??= Storage(client);
+  static Messaging get messaging => _messaging ??= Messaging(client);
+
+  static Future<void> setUserRole(String role) async {
+    try {
+      await account.updatePrefs(prefs: {'role': role});
+    } catch (e) {
+      debugPrint('Error setting role: $e');
+    }
+  }
+
+  static Future<String?> getUserRole() async {
+    try {
+      final prefs = await account.getPrefs();
+      return prefs.data['role'] as String?;
+    } catch (e) {
+      debugPrint('Error getting role: $e');
+      return null;
+    }
+  }
+
+  static Future<String?> getRestaurantIdByName(String name) async {
+    try {
+      final response = await databases.listDocuments(
+        databaseId: Environment.appwriteDatabaseId,
+        collectionId: Environment.appwriteRestaurantsCollectionId,
+      );
+      
+      final lowerName = name.trim().toLowerCase();
+      final normUser = lowerName.replaceAll(RegExp(r'[^a-z0-9\u0600-\u06FF]'), '');
+
+      for (var doc in response.documents) {
+        final docName = (doc.data['name']?.toString() ?? '').trim().toLowerCase();
+        final docNameAr = (doc.data['nameAr']?.toString() ?? '').trim().toLowerCase();
+        
+        final normDoc = docName.replaceAll(RegExp(r'[^a-z0-9\u0600-\u06FF]'), '');
+        final normDocAr = docNameAr.replaceAll(RegExp(r'[^a-z0-9\u0600-\u06FF]'), '');
+
+        if (docName == lowerName || docNameAr == lowerName || 
+            docName.contains(lowerName) || lowerName.contains(docName) ||
+            docNameAr.contains(lowerName) || lowerName.contains(docNameAr)) {
+          return doc.$id;
+        }
+
+        if (normUser.isNotEmpty && normDoc.isNotEmpty && (normDoc.contains(normUser) || normUser.contains(normDoc))) return doc.$id;
+        if (normUser.isNotEmpty && normDocAr.isNotEmpty && (normDocAr.contains(normUser) || normUser.contains(normDocAr))) return doc.$id;
+
+        final userWords = lowerName.split(RegExp(r'[\s\.\-_]+')).where((w) => w.length >= 4).toList();
+        for (final word in userWords) {
+          if (docName.contains(word) || docNameAr.contains(word)) {
+            return doc.$id;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error getting restaurant by name: $e');
+    }
+    return null;
+  }
 
   static Future<List<dynamic>> getRestaurants() async {
     try {
@@ -188,6 +248,37 @@ class AppwriteService {
     }
   }
 
+  static Future<List<dynamic>> getRestaurantOrders(String restaurantId, {String? restaurantName}) async {
+    try {
+      final response = await databases.listDocuments(
+        databaseId: Environment.appwriteDatabaseId,
+        collectionId: Environment.appwriteOrdersCollectionId,
+        queries: [
+          Query.equal('restaurantId', restaurantId),
+          Query.orderDesc('\$createdAt'),
+        ],
+      );
+      return response.documents;
+    } catch (e) {
+      debugPrint('Get restaurant orders error: $e');
+      return [];
+    }
+  }
+
+  static Future<void> updateOrderStatus(String orderId, String status) async {
+    try {
+      await databases.updateDocument(
+        databaseId: Environment.appwriteDatabaseId,
+        collectionId: Environment.appwriteOrdersCollectionId,
+        documentId: orderId,
+        data: {'status': status},
+      );
+    } catch (e) {
+      debugPrint('Update order status error: $e');
+      rethrow;
+    }
+  }
+
   static Future<void> addFavorite(String userId, String restaurantId) async {
     try {
       await databases.createDocument(
@@ -221,19 +312,40 @@ class AppwriteService {
         collectionId: Environment.appwriteMenuItemsCollectionId,
         queries: [Query.equal('restaurantId', restaurantId)],
       );
-      return response.documents.map((doc) {
+      final docs = response.documents;
+      final items = await Future.wait(docs.map((doc) async {
         final d = doc.data;
+        
+        String name = d['name'] ?? '';
+        String nameAr = d['nameAr'] ?? '';
+        if (nameAr.isEmpty && name.isNotEmpty) {
+          nameAr = await TranslatorService.translateToArabic(name);
+        }
+
+        String description = d['description'] ?? '';
+        String descriptionAr = d['descriptionAr'] ?? '';
+        if (descriptionAr.isEmpty && description.isNotEmpty) {
+          descriptionAr = await TranslatorService.translateToArabic(description);
+        }
+
+        String category = d['category'] ?? '';
+        if (category.isNotEmpty) {
+          category = await TranslatorService.translateToArabic(category);
+        }
+
         return MenuItem(
           id: doc.$id,
-          name: d['name'] ?? '',
-          nameAr: d['nameAr'] ?? '',
-          description: d['description'] ?? '',
+          name: name,
+          nameAr: nameAr,
+          description: description,
+          descriptionAr: descriptionAr,
           price: (d['price'] as num?)?.toDouble() ?? 0.0,
-          category: d['category'] ?? '',
+          category: category,
           imageUrl: d['imageUrl'] ?? '',
           isPopular: d['isPopular'] ?? false,
         );
-      }).toList();
+      }));
+      return items;
     } catch (e) {
       debugPrint('Get menu items error: $e');
       return [];
@@ -252,5 +364,30 @@ class AppwriteService {
       debugPrint('Get favorites error: $e');
       return [];
     }
+  }
+}
+
+class AuthExceptionHandler {
+  static String handleException(dynamic e) {
+    if (e is AppwriteException) {
+      final message = e.message?.toLowerCase() ?? '';
+      if (message.contains('invalid credentials') || message.contains('invalid email') || message.contains('invalid password')) {
+        return 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
+      } else if (message.contains('user already exists')) {
+        return 'البريد الإلكتروني مستخدم بالفعل.';
+      } else if (message.contains('user not found') || message.contains('user (role: guests) missing scope')) {
+        return 'المستخدم غير موجود أو الجلسة منتهية.';
+      } else if (message.contains('password must be at least') || message.contains('password must be between')) {
+        return 'كلمة المرور يجب أن تكون 8 أحرف على الأقل.';
+      } else if (message.contains('network error') || message.contains('socket') || message.contains('connection')) {
+        return 'خطأ في الاتصال بالشبكة. يرجى التحقق من الإنترنت.';
+      } else if (message.contains('rate limit')) {
+        return 'تم تجاوز الحد المسموح به للمحاولات. يرجى المحاولة لاحقاً.';
+      } else if (message.contains('blocked')) {
+        return 'هذا الحساب محظور. يرجى التواصل مع الدعم.';
+      }
+      return 'حدث خطأ: ${e.message}';
+    }
+    return 'حدث خطأ غير متوقع. يرجى المحاولة مجدداً.';
   }
 }

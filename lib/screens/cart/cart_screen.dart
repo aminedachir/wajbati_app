@@ -246,7 +246,7 @@ class _CartScreenState extends State<CartScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    ci.item.name,
+                                    ci.item.nameAr.isNotEmpty ? ci.item.nameAr : ci.item.name,
                                     style: GoogleFonts.cairo(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w700,

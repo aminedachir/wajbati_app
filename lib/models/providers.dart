@@ -3,6 +3,7 @@ import 'package:appwrite/appwrite.dart';
 import 'dart:convert';
 import 'dart:math';
 import 'package:get_storage/get_storage.dart';
+import 'package:appwrite/models.dart';
 import 'models.dart';
 import 'user.dart';
 import '../utils/appwrite_service.dart';
@@ -44,16 +45,25 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<String?> signIn(String email, String password) async {
+  Future<String?> signIn(String email, String password, {String expectedRole = 'client'}) async {
     _loading = true;
     _error = null;
     notifyListeners();
     try {
       await AppwriteService.createEmailPasswordSession(email, password);
+      
+      final role = await AppwriteService.getUserRole() ?? 'client';
+      if (role != expectedRole) {
+        await AppwriteService.account.deleteSession(sessionId: 'current');
+        return expectedRole == 'restaurant' 
+            ? 'هذا الحساب ليس حساب مطعم.' 
+            : 'هذا الحساب خاص بالمطاعم، يرجى استخدام تطبيق المطعم.';
+      }
+
       await _checkAuthStatus();
       return null;
     } catch (e) {
-      _error = e.toString();
+      _error = AuthExceptionHandler.handleException(e);
       return _error;
     } finally {
       _loading = false;
@@ -68,10 +78,11 @@ class AuthProvider extends ChangeNotifier {
     try {
       await AppwriteService.createAccount(email, password, name);
       await AppwriteService.createEmailPasswordSession(email, password);
+      await AppwriteService.setUserRole('client');
       await _checkAuthStatus();
       return null;
     } catch (e) {
-      _error = e.toString();
+      _error = AuthExceptionHandler.handleException(e);
       return _error;
     } finally {
       _loading = false;
@@ -360,7 +371,7 @@ class OrdersProvider extends ChangeNotifier {
         collectionId: Environment.appwriteOrdersCollectionId,
         queries: [
           Query.equal('userId', userId),
-          Query.orderDesc('createdAt'),
+          Query.orderDesc('\$createdAt'),
         ],
       );
       _orders = response.documents.map((doc) {
@@ -381,6 +392,7 @@ class OrdersProvider extends ChangeNotifier {
 
   Future<AppOrder?> placeOrder({
     required String userId,
+    required String customerName,
     required CartProvider cart,
     required String paymentMethod,
     bool isGroupOrder = false,
@@ -405,6 +417,9 @@ class OrdersProvider extends ChangeNotifier {
     // Real user: save to Appwrite
     final orderData = <String, Object>{
       'userId': userId,
+      'customerName': customerName,
+      'customerPhone': '0550000000', // TODO: Add real phone input
+      'deliveryAddress': 'العنوان غير محدد', // TODO: Add real address input
       'orderNumber': orderNum,
       'restaurantName': cart.restaurant!.name,
       'restaurantId': cart.restaurant!.id,
@@ -413,7 +428,7 @@ class OrdersProvider extends ChangeNotifier {
       'deliveryFee': cart.deliveryFee,
       'discount': cart.promoDiscount,
       'total': cart.total,
-      'status': 'جاري التحضير',
+      'status': 'طلب جديد',
       'paymentMethod': paymentMethod,
       'isGroupOrder': isGroupOrder,
       'specialInstructions': cart.specialInstructions,
@@ -421,13 +436,41 @@ class OrdersProvider extends ChangeNotifier {
     };
 
     try {
-      final response = await AppwriteService.databases.createDocument(
-        databaseId: Environment.appwriteDatabaseId,
-        collectionId: Environment.appwriteOrdersCollectionId,
-        documentId: ID.unique(),
-        data: orderData,
-      );
+      Document? response;
+      try {
+        response = await AppwriteService.databases.createDocument(
+          databaseId: Environment.appwriteDatabaseId,
+          collectionId: Environment.appwriteOrdersCollectionId,
+          documentId: ID.unique(),
+          data: orderData,
+        );
+      } catch (e) {
+        if (e is AppwriteException && e.code == 400) {
+          // Fallback for missing attributes in user's Appwrite schema
+          final fallbackData = <String, Object>{
+            'userId': userId,
+            'orderNumber': orderNum,
+            'restaurantId': cart.restaurant!.id,
+            'restaurantName': cart.restaurant!.name,
+            'items': jsonEncode(itemsList),
+            'subtotal': cart.subtotal,
+            'deliveryFee': cart.deliveryFee,
+            'total': cart.total,
+            'status': 'طلب جديد',
+            'createdAt': DateTime.now().toIso8601String(),
+          };
+          response = await AppwriteService.databases.createDocument(
+            databaseId: Environment.appwriteDatabaseId,
+            collectionId: Environment.appwriteOrdersCollectionId,
+            documentId: ID.unique(),
+            data: fallbackData,
+          );
+        } else {
+          rethrow;
+        }
+      }
 
+      if (response == null) throw Exception('Failed to create order document');
       final responseData = Map<String, dynamic>.from(response.data);
       if (responseData['items'] is String) {
         responseData['items'] = jsonDecode(responseData['items'] as String);
@@ -463,7 +506,7 @@ class OrdersProvider extends ChangeNotifier {
         deliveryFee: cart.deliveryFee,
         discount: cart.promoDiscount,
         total: cart.total,
-        status: 'جاري التحضير',
+        status: 'طلب جديد',
         paymentMethod: paymentMethod,
         isGroupOrder: isGroupOrder,
         specialInstructions: cart.specialInstructions,

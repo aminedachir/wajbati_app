@@ -3,24 +3,70 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import '../../theme/app_theme.dart';
 import '../../models/models.dart';
+import '../../utils/realtime_service.dart';
 
-class TrackOrderScreen extends StatelessWidget {
+class TrackOrderScreen extends StatefulWidget {
   final AppOrder order;
   const TrackOrderScreen({super.key, required this.order});
 
   @override
+  State<TrackOrderScreen> createState() => _TrackOrderScreenState();
+}
+
+class _TrackOrderScreenState extends State<TrackOrderScreen> {
+  late String _currentStatus;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentStatus = widget.order.status;
+
+    // Subscribe to live status updates for this order
+    if (!widget.order.id.startsWith('local_')) {
+      RealtimeService.watchOrder(
+        widget.order.id,
+        onUpdate: (newStatus, _) {
+          if (mounted) setState(() => _currentStatus = newStatus);
+        },
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    RealtimeService.cancelOrderWatch();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Use live status instead of original order status
+    final liveOrder = AppOrder(
+      id: widget.order.id,
+      orderNumber: widget.order.orderNumber,
+      restaurantId: widget.order.restaurantId,
+      restaurantName: widget.order.restaurantName,
+      items: widget.order.items,
+      subtotal: widget.order.subtotal,
+      deliveryFee: widget.order.deliveryFee,
+      discount: widget.order.discount,
+      total: widget.order.total,
+      status: _currentStatus,
+      paymentMethod: widget.order.paymentMethod,
+      isGroupOrder: widget.order.isGroupOrder,
+      createdAt: widget.order.createdAt,
+    );
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final mutedColor =
         isDark ? AppTheme.textMutedDark : AppTheme.textMutedLight;
 
     // Derive steps from the order status
-    final steps = _buildSteps(order.status);
+    final steps = _buildSteps(liveOrder.status);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'تتبع الطلب ${order.orderNumber}',
+          'تتبع الطلب ${liveOrder.orderNumber}',
           style: GoogleFonts.cairo(fontWeight: FontWeight.w700),
         ),
         leading: IconButton(
@@ -115,12 +161,12 @@ class TrackOrderScreen extends StatelessWidget {
                             ),
                             const SizedBox(width: 10),
                             Expanded(
-                              child: Text(order.restaurantName,
+                              child: Text(liveOrder.restaurantName,
                                   style: GoogleFonts.cairo(
                                       fontWeight: FontWeight.w700,
                                       fontSize: 15)),
                             ),
-                            Text(order.orderNumber,
+                            Text(liveOrder.orderNumber,
                                 style: GoogleFonts.cairo(
                                     fontSize: 12,
                                     color: AppTheme.primary,
@@ -129,7 +175,7 @@ class TrackOrderScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         // Items list
-                        ...order.items.map((item) => Padding(
+                        ...liveOrder.items.map((item) => Padding(
                               padding: const EdgeInsets.symmetric(vertical: 3),
                               child: Row(
                                 mainAxisAlignment:
@@ -159,7 +205,7 @@ class TrackOrderScreen extends StatelessWidget {
                             Text('الإجمالي',
                                 style: GoogleFonts.cairo(
                                     fontWeight: FontWeight.w700, fontSize: 15)),
-                            Text('${order.total.toInt()} د.ج',
+                            Text('${liveOrder.total.toInt()} د.ج',
                                 style: GoogleFonts.cairo(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 16,
@@ -302,7 +348,7 @@ class TrackOrderScreen extends StatelessWidget {
                   // ── Order placed time ──────────────────────
                   Center(
                     child: Text(
-                      'طلب بتاريخ ${order.formattedDate}',
+                      'طلب بتاريخ ${liveOrder.formattedDate}',
                       style: GoogleFonts.cairo(fontSize: 12, color: mutedColor),
                     ),
                   ),
@@ -362,7 +408,7 @@ class TrackOrderScreen extends StatelessWidget {
   }
 
   String _estimatedTime() {
-    final eta = order.createdAt.add(const Duration(minutes: 35));
+    final eta = widget.order.createdAt.add(const Duration(minutes: 35));
     final h = eta.hour.toString().padLeft(2, '0');
     final m = eta.minute.toString().padLeft(2, '0');
     return '$h:$m (≈ 35 د.ق)';

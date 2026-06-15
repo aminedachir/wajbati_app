@@ -96,7 +96,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
           description: 'طاجين زيتون تقليدي محضر بطريقة صحية للحمية.',
           price: 600,
           category: 'حمية وغذاء صحي',
-          imageUrl: 'https://images.unsplash.com/photo-1541518763669-27f90b116ad4?q=80&w=2070',
+          imageUrl: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=2070',
           isHealthOriented: true,
         ),
         const MenuItem(
@@ -106,7 +106,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
           description: 'كسكسي تقليدي مصنوع من القمح الكامل الغني بالألياف.',
           price: 750,
           category: 'حمية وغذاء صحي',
-          imageUrl: 'https://images.unsplash.com/photo-1541518763669-27f90b116ad4?q=80&w=2070',
+          imageUrl: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=2070',
           isHealthOriented: true,
         ),
         const MenuItem(
@@ -296,7 +296,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(widget.restaurant.name,
+                            Text(widget.restaurant.nameAr.isNotEmpty ? widget.restaurant.nameAr : widget.restaurant.name,
                                 style: GoogleFonts.cairo(
                                     fontSize: 24,
                                     fontWeight: FontWeight.w700,

@@ -217,7 +217,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   if (err != null) {
                                     ScaffoldMessenger.of(context)
                                         .showSnackBar(SnackBar(
-                                      content: Text(_friendlyError(err),
+                                      content: Text(err,
                                           style: GoogleFonts.cairo()),
                                       backgroundColor: Colors.red,
                                       behavior: SnackBarBehavior.floating,
@@ -296,16 +296,7 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  String _friendlyError(String raw) {
-    if (raw.contains('already exists') || raw.contains('409')) {
-      return 'هذا البريد الإلكتروني مسجل بالفعل. حاول تسجيل الدخول.';
-    }
-    if (raw.contains('Invalid email')) return 'يرجى إدخال بريد إلكتروني صالح.';
-    if (raw.contains('password')) {
-      return 'يجب أن تكون كلمة المرور 8 أحرف على الأقل.';
-    }
-    return 'حدث خطأ ما. يرجى المحاولة مرة أخرى.';
-  }
+
 }
 
 // ── Form helpers ───────────────────────────────────────────────────

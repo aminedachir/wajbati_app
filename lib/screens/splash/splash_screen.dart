@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import '../../models/providers.dart';
-import '../../theme/app_theme.dart';
+import '../auth/role_picker_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -12,47 +9,85 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _ctrl;
-  late Animation<double> _fade;
-  late Animation<double> _scale;
+    with TickerProviderStateMixin {
+  late AnimationController _logoController;
+  late AnimationController _textController;
+  late AnimationController _taglineController;
+
+  late Animation<double> _logoScale;
+  late Animation<double> _logoOpacity;
+  late Animation<double> _taglineOpacity;
+  late Animation<Offset> _taglineSlide;
 
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 1200));
-    _fade = Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(
-        parent: _ctrl, curve: const Interval(0, 0.6, curve: Curves.easeOut)));
-    _scale = Tween<double>(begin: 0.7, end: 1).animate(CurvedAnimation(
-        parent: _ctrl,
-        curve: const Interval(0, 0.6, curve: Curves.elasticOut)));
-    _ctrl.forward();
 
-    _navigateNext();
+    // Logo animation
+    _logoController = AnimationController(
+      duration: const Duration(milliseconds: 900),
+      vsync: this,
+    );
+    _logoScale = Tween<double>(begin: 0.6, end: 1.0).animate(
+      CurvedAnimation(parent: _logoController, curve: Curves.elasticOut),
+    );
+    _logoOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _logoController,
+        curve: const Interval(0.0, 0.5, curve: Curves.easeIn),
+      ),
+    );
+
+    // Tagline animation
+    _taglineController = AnimationController(
+      duration: const Duration(milliseconds: 700),
+      vsync: this,
+    );
+    _taglineOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _taglineController, curve: Curves.easeIn),
+    );
+    _taglineSlide =
+        Tween<Offset>(begin: const Offset(0, 0.4), end: Offset.zero).animate(
+      CurvedAnimation(parent: _taglineController, curve: Curves.easeOut),
+    );
+
+    // Text animation (brand name below logo)
+    _textController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+
+    _startAnimations();
   }
 
-  Future<void> _navigateNext() async {
-    // Wait for the animation and a bit of time
-    await Future.delayed(const Duration(seconds: 3));
-    
-    if (!mounted) return;
+  Future<void> _startAnimations() async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    _logoController.forward();
 
-    // Use Provider to check auth status if needed, 
-    // though AuthProvider in models/providers.dart currently uses mock data.
-    final authProvider = context.read<AuthProvider>();
-    
+    await Future.delayed(const Duration(milliseconds: 500));
+    _textController.forward();
+
+    await Future.delayed(const Duration(milliseconds: 300));
+    _taglineController.forward();
+
+    // Navigate after splash
+    await Future.delayed(const Duration(milliseconds: 1800));
     if (mounted) {
-      Navigator.pushReplacementNamed(
-        context, 
-        authProvider.isLoggedIn ? '/home' : '/login'
-      );
+      _navigateNext();
     }
+  }
+
+  void _navigateNext() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const RolePickerScreen()),
+    );
   }
 
   @override
   void dispose() {
-    _ctrl.dispose();
+    _logoController.dispose();
+    _textController.dispose();
+    _taglineController.dispose();
     super.dispose();
   }
 
@@ -60,106 +95,220 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [AppTheme.primary, Color(0xFFBF1A12)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFFFFFFF),
+              Color(0xFFF5F5F5),
+            ],
           ),
         ),
-        child: SafeArea(
-          child: Center(
-            child: FadeTransition(
-              opacity: _fade,
-              child: ScaleTransition(
-                scale: _scale,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 130,
-                      height: 130,
+        child: Stack(
+          children: [
+            // Decorative background circles
+            Positioned(
+              top: -80,
+              right: -80,
+              child: Container(
+                width: 250,
+                height: 250,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFFE53935).withOpacity(0.06),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: -100,
+              left: -60,
+              child: Container(
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFF1565C0).withOpacity(0.06),
+                ),
+              ),
+            ),
+
+            // Main content
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Logo image
+                  AnimatedBuilder(
+                    animation: _logoController,
+                    builder: (context, child) {
+                      return Opacity(
+                        opacity: _logoOpacity.value,
+                        child: Transform.scale(
+                          scale: _logoScale.value,
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: Container(
+                      width: 200,
+                      height: 200,
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
+                        borderRadius: BorderRadius.circular(28),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.2),
+                            color: Colors.black.withOpacity(0.10),
                             blurRadius: 30,
                             offset: const Offset(0, 10),
                           ),
                         ],
                       ),
-                      child: const Center(child: _LogoIcon()),
-                    ),
-                    const SizedBox(height: 28),
-                    Text(
-                      'وجبتي DZ',
-                      style: GoogleFonts.cairo(
-                        fontSize: 36,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                        letterSpacing: 1,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(28),
+                        child: Image.asset(
+                          'assets/images/logo.jpg',
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'أكلتك المفضلة، تصلك بسرعة',
-                      style: GoogleFonts.cairo(
-                        fontSize: 15,
-                        color: Colors.white.withValues(alpha: 0.85),
-                        fontWeight: FontWeight.w400,
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  // Tagline
+                  SlideTransition(
+                    position: _taglineSlide,
+                    child: FadeTransition(
+                      opacity: _taglineOpacity,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: Column(
+                          children: [
+                            Text(
+                              'طلبك ساهل',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFFE53935),
+                                letterSpacing: 0.5,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black.withOpacity(0.08),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'وطعامك واصل',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF1565C0),
+                                letterSpacing: 0.5,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black.withOpacity(0.08),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 60),
-                    SizedBox(
-                      width: 32,
-                      height: 32,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white.withValues(alpha: 0.7)),
-                      ),
-                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Bottom loading dots
+            Positioned(
+              bottom: 60,
+              left: 0,
+              right: 0,
+              child: FadeTransition(
+                opacity: _taglineOpacity,
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _PulsingDot(delay: 0, color: Color(0xFFE53935)),
+                    SizedBox(width: 8),
+                    _PulsingDot(delay: 200, color: Color(0xFFE88A00)),
+                    SizedBox(width: 8),
+                    _PulsingDot(delay: 400, color: Color(0xFF1565C0)),
                   ],
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _LogoIcon extends StatelessWidget {
-  const _LogoIcon();
+class _PulsingDot extends StatefulWidget {
+  final int delay;
+  final Color color;
+
+  const _PulsingDot({required this.delay, required this.color});
+
+  @override
+  State<_PulsingDot> createState() => _PulsingDotState();
+}
+
+class _PulsingDotState extends State<_PulsingDot>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 700),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: 0.5, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+    Future.delayed(Duration(milliseconds: widget.delay), () {
+      if (mounted) _controller.repeat(reverse: true);
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: AppTheme.secondary, width: 3),
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Opacity(
+          opacity: _animation.value,
+          child: Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: widget.color,
+            ),
           ),
-        ),
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.restaurant, size: 40, color: AppTheme.primary),
-            Text('DZ',
-                style: GoogleFonts.cairo(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.secondary)),
-          ],
-        ),
-      ],
+        );
+      },
     );
   }
 }

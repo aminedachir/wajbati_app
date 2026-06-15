@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import '../../../widgets/widgets.dart';
-import '../../../models/models.dart';
 import '../../../theme/app_theme.dart';
 import '../../../models/providers.dart';
 import '../../../models/home_provider.dart';

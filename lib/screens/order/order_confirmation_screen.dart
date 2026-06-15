@@ -52,6 +52,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
     if (auth.isLoggedIn && auth.user != null) {
       order = await orders.placeOrder(
         userId: auth.user!.uid,
+        customerName: auth.user!.name,
         cart: cart,
         paymentMethod: widget.paymentMethod,
         isGroupOrder: widget.isGroupOrder,
@@ -159,7 +160,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
               height: 52,
               child: ElevatedButton(
                 onPressed: () =>
-                    Navigator.of(context).popUntil((route) => route.isFirst),
+                    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.primary,
                   shape: RoundedRectangleBorder(
@@ -301,10 +302,15 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                                '${item.quantity}× ${item.nameAr.isNotEmpty ? item.nameAr : item.name}',
-                                style: GoogleFonts.cairo(
-                                    fontSize: 13, color: mutedColor)),
+                            Expanded(
+                              child: Text(
+                                  '${item.quantity}× ${item.nameAr.isNotEmpty ? item.nameAr : item.name}',
+                                  style: GoogleFonts.cairo(
+                                      fontSize: 13, color: mutedColor),
+                                  overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
                             Text('${(item.price * item.quantity).toInt()} د.ج',
                                 style: GoogleFonts.cairo(
                                     fontSize: 13, fontWeight: FontWeight.w600)),
@@ -403,7 +409,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
             height: 54,
             child: OutlinedButton(
               onPressed: () =>
-                  Navigator.of(context).popUntil((route) => route.isFirst),
+                  Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: AppTheme.primary, width: 1.5),
                 shape: RoundedRectangleBorder(

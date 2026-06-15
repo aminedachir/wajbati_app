@@ -150,7 +150,8 @@ class ProfileScreen extends StatelessWidget {
                   ],
                 ),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppTheme.primary.withValues(alpha: 0.2)),
+                border:
+                    Border.all(color: AppTheme.primary.withValues(alpha: 0.2)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -547,7 +548,8 @@ class _ThemeToggle extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: (isDark ? Colors.amber : Colors.blueGrey).withValues(alpha: 0.1),
+            color: (isDark ? Colors.amber : Colors.blueGrey)
+                .withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(

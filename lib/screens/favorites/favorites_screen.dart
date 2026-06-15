@@ -152,9 +152,9 @@ class _FavoriteCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      restaurant.name,
+                      restaurant.nameAr.isNotEmpty ? restaurant.nameAr : restaurant.name,
                       style: GoogleFonts.cairo(
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color:
                               isDark ? AppTheme.textDark : AppTheme.textLight),

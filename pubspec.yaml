@@ -33,6 +33,7 @@ dependencies:
   get_storage: ^2.1.1
   appwrite: ^23.0.0
   visibility_detector: ^0.4.0+2
+  flutter_local_notifications: ^19.5.0
 
 dev_dependencies:
   flutter_test:
@@ -45,6 +46,7 @@ flutter:
   assets:
     - assets/logos/
     - assets/photos/
+    - assets/images/
 
 flutter_launcher_icons:
   android: "launcher_icon"

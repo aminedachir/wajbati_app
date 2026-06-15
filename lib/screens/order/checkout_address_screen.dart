@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../theme/app_theme.dart';
-import 'order_confirmation_screen.dart';
 import 'checkout_payment_screen.dart';
 
 class CheckoutAddressScreen extends StatefulWidget {
